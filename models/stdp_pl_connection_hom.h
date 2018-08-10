@@ -92,6 +92,10 @@ public:
   // data members common to all connections
   double tau_plus_;
   double tau_plus_inv_; //!< 1 / tau_plus for efficiency
+#if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+  double tau_minus_;
+  double tau_minus_inv_; //!< 1 / tau_minus for efficiency
+#endif
   double lambda_;
   double alpha_;
   double mu_;
@@ -210,6 +214,10 @@ private:
   // data members of each connection
   double weight_;
   double Kplus_;
+#if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+  double Kminus_;
+#endif
+
   double t_lastspike_;
 };
 
@@ -231,6 +239,7 @@ STDPPLConnectionHom< targetidentifierT >::send( Event& e,
   // synapse STDP depressing/facilitation dynamics
 
   const double t_spike = e.get_stamp().get_ms();
+  double Kminus_value = -1.;
 
   // t_lastspike_ = 0 initially
 
@@ -251,6 +260,19 @@ STDPPLConnectionHom< targetidentifierT >::send( Event& e,
   while ( start != finish )
   {
     minus_dt = t_lastspike_ - ( start->t_ + dendritic_delay );
+
+#if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+    // for each post spike: update the trace
+    Kminus_ =
+      Kminus_ * std::exp( minus_dt * cp.tau_minus_inv_ ) + 1.0;
+
+    // // we need the value of Kminus_ at `t = t_spike - dendritic_delay`
+    // if (Kminus_value < 0. && t_spike - dendritic_delay) {
+    //   Kminus_value = Kminus_ * std::exp( (t_spike - dendritic_delay) * cp.tau_minus_inv_ );
+    // }
+
+#endif
+
     start++;
     // get_history() should make sure that
     // start->t_ > t_lastspike - dendritic_delay, i.e. minus_dt < 0
@@ -260,8 +282,12 @@ STDPPLConnectionHom< targetidentifierT >::send( Event& e,
   }
 
   // depression due to new pre-synaptic spike
-  weight_ =
-    depress_( weight_, target->get_K_value( t_spike - dendritic_delay ), cp );
+#if (STDP_TEST == STDP_TEST_NATIVE_NEST)
+  Kminus_value = target->get_K_value( t_spike - dendritic_delay );
+#elif STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+  assert(target->get_K_value( t_spike - dendritic_delay ) == Kminus_value);
+#endif
+  weight_ = depress_( weight_, Kminus_value, cp );
 
   e.set_receiver( *target );
   e.set_weight( weight_ );
@@ -280,6 +306,9 @@ STDPPLConnectionHom< targetidentifierT >::STDPPLConnectionHom()
   : ConnectionBase()
   , weight_( 1.0 )
   , Kplus_( 0.0 )
+#if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+  , Kminus_( 0.0 )
+#endif  
   , t_lastspike_( 0.0 )
 {
 }
@@ -290,6 +319,9 @@ STDPPLConnectionHom< targetidentifierT >::STDPPLConnectionHom(
   : ConnectionBase( rhs )
   , weight_( rhs.weight_ )
   , Kplus_( rhs.Kplus_ )
+#if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+  , Kminus_( rhs.Kminus_ )
+#endif
   , t_lastspike_( rhs.t_lastspike_ )
 {
 }
@@ -305,6 +337,9 @@ STDPPLConnectionHom< targetidentifierT >::get_status( DictionaryDatum& d ) const
 
   // own properties, different for individual synapse
   def< double >( d, names::Kplus, Kplus_ );
+#if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+  def< double >( d, names::Kminus, Kminus_ );
+#endif
   def< long >( d, names::size_of, sizeof( *this ) );
 }
 
@@ -318,6 +353,9 @@ STDPPLConnectionHom< targetidentifierT >::set_status( const DictionaryDatum& d,
   updateValue< double >( d, names::weight, weight_ );
 
   updateValue< double >( d, names::Kplus, Kplus_ );
+#if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+  updateValue< double >( d, names::Kminus, Kminus_ );
+#endif
 }
 
 } // of namespace nest

@@ -229,6 +229,9 @@ const Name interval( "interval" );
 const Name is_refractory( "is_refractory" );
 
 const Name keep_source_table( "keep_source_table" );
+#if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+const Name Kminus( "Kminus" );
+#endif
 const Name Kplus( "Kplus" );
 const Name Kplus_triplet( "Kplus_triplet" );
 

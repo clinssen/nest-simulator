@@ -42,6 +42,10 @@ STDPPLHomCommonProperties::STDPPLHomCommonProperties()
   : CommonSynapseProperties()
   , tau_plus_( 20.0 )
   , tau_plus_inv_( 1. / tau_plus_ )
+#if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+  , tau_minus_( 20.0 )
+  , tau_minus_inv_( 1. / tau_minus_ )
+#endif
   , lambda_( 0.1 )
   , alpha_( 1.0 )
   , mu_( 0.4 )
@@ -54,6 +58,9 @@ STDPPLHomCommonProperties::get_status( DictionaryDatum& d ) const
   CommonSynapseProperties::get_status( d );
 
   def< double >( d, names::tau_plus, tau_plus_ );
+#if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+  def< double >( d, names::tau_minus, tau_minus_ );
+#endif
   def< double >( d, names::lambda, lambda_ );
   def< double >( d, names::alpha, alpha_ );
   def< double >( d, names::mu, mu_ );
@@ -64,6 +71,18 @@ STDPPLHomCommonProperties::set_status( const DictionaryDatum& d,
   ConnectorModel& cm )
 {
   CommonSynapseProperties::set_status( d, cm );
+
+  updateValue< double >( d, names::tau_minus, tau_minus_ );
+#if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+  if ( tau_minus_ > 0. )
+  {
+    tau_minus_inv_ = 1. / tau_minus_;
+  }
+  else
+  {
+    throw BadProperty( "tau_minus > 0. required." );
+  }
+#endif
 
   updateValue< double >( d, names::tau_plus, tau_plus_ );
   if ( tau_plus_ > 0. )

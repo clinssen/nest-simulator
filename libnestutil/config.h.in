@@ -166,4 +166,14 @@
 /* Use PS array construction semantics */
 #cmakedefine PS_ARRAYS 1
 
+
+/**
+ *  Select here the type of STDP experiment to be carried out
+**/
+
+#define STDP_TEST_NATIVE_NEST   0
+#define STDP_TEST_SYNAPTIC_POST_TRACE   1
+#define STDP_TEST   STDP_TEST_SYNAPTIC_POST_TRACE
+
+
 #endif // #ifndef CONFIG_H

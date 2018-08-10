@@ -130,7 +130,6 @@ tau_syn = 0.32582722403722841
 
 
 # -----------------------------------------------------------------------------
-
 brunel_params = {
     'NE': int(9000 * params['scale']),  # number of excitatory neurons
     'NI': int(2250 * params['scale']),  # number of inhibitory neurons
@@ -173,12 +172,16 @@ brunel_params = {
         'alpha': 0.0513,
         'lambda': 0.1,  # STDP step size
         'mu': 0.4,  # STDP weight dependence exponent(potentiation)
+        'tau_minus': 30.0,  # time constant for potentiation
         'tau_plus': 15.0,  # time constant for potentiation
     },
 
     'eta': 1.685,  # scaling of external stimulus
     'filestem': params['path_name']
 }
+
+assert brunel_params["model_params"]["tau_minus"] == brunel_params["stdp_params"]["tau_minus"]
+
 
 '''FUNCTION SECTION
 
