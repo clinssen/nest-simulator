@@ -109,8 +109,8 @@ nest::Archiving_Node::get_K_value( double t )
   {
     if ( t - history_[ i ].t_ > kernel().connection_manager.get_stdp_eps() )
     {
-      std::cout << "\thistory_[" << i << "] = " << history_[ i ].Kminus_ << ", returning " << ( history_[ i ].Kminus_
-        * std::exp( ( history_[ i ].t_ - t ) * tau_minus_inv_ ) )<< std::endl;
+      std::cout << "\thistory_[" << i << "].t_ = " << history_[ i ].t_ << ", Kminus_ = " << history_[ i ].Kminus_ << ", returning " << ( history_[ i ].Kminus_
+        * std::exp( ( history_[ i ].t_ - t ) * tau_minus_inv_ ) ) << std::endl;
       return ( history_[ i ].Kminus_
         * std::exp( ( history_[ i ].t_ - t ) * tau_minus_inv_ ) );
     }
