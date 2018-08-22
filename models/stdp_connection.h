@@ -216,6 +216,7 @@ STDPConnection< targetidentifierT >::send( Event& e,
 {
   // synapse STDP depressing/facilitation dynamics
   double t_spike = e.get_stamp().get_ms();
+  double Kminus_value = -1.;
 
   // use accessor functions (inherited from Connection< >) to obtain delay and
   // target
@@ -251,8 +252,14 @@ STDPConnection< targetidentifierT >::send( Event& e,
   }
 
   // depression due to new pre-synaptic spike
+#if (STDP_TEST == STDP_TEST_NATIVE_NEST)
+  std::cout << "In STDPConnection::send(): calling get_K_value()" << std::endl;
+  Kminus_value = target->get_K_value( t_spike - dendritic_delay );
+#elif STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+  assert(target->get_K_value( t_spike - dendritic_delay ) == Kminus_value);
+#endif
   weight_ =
-    depress_( weight_, target->get_K_value( t_spike - dendritic_delay ) );
+    depress_( weight_, Kminus_value );
 
   e.set_receiver( *target );
   e.set_weight( weight_ );

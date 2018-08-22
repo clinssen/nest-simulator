@@ -98,8 +98,10 @@ Archiving_Node::register_stdp_connection( double t_first_read )
 double
 nest::Archiving_Node::get_K_value( double t )
 {
+  std::cout << "In Archiving_Node::get_K_value" << std::endl;
   if ( history_.empty() )
   {
+    std::cout << "\thistory is empty: returning Kminus_ = " << Kminus_ << std::endl;
     return Kminus_;
   }
   int i = history_.size() - 1;
@@ -107,6 +109,8 @@ nest::Archiving_Node::get_K_value( double t )
   {
     if ( t - history_[ i ].t_ > kernel().connection_manager.get_stdp_eps() )
     {
+      std::cout << "\thistory_[" << i << "] = " << history_[ i ].Kminus_ << ", returning " << ( history_[ i ].Kminus_
+        * std::exp( ( history_[ i ].t_ - t ) * tau_minus_inv_ ) )<< std::endl;
       return ( history_[ i ].Kminus_
         * std::exp( ( history_[ i ].t_ - t ) * tau_minus_inv_ ) );
     }

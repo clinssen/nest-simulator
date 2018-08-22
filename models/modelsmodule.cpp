@@ -563,7 +563,6 @@ ModelsModule::init( SLIInterpreter* )
     .register_connection_model< Quantal_StpConnection< TargetIdentifierIndex > >(
       "quantal_stp_synapse_hpc" );
 
-
   /* BeginDocumentation
      Name: stdp_synapse_hom_hpc - Variant of quantal_stp_synapse with low memory
      consumption.

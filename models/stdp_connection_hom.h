@@ -306,6 +306,7 @@ STDPConnectionHom< targetidentifierT >::send( Event& e,
   }
 
   // depression due to new pre-synaptic spike
+  std::cout << "In STDPConnectionHom::send(): calling get_K_value()" << std::endl;
   weight_ =
     depress_( weight_, target->get_K_value( t_spike - dendritic_delay ), cp );
 

@@ -72,8 +72,8 @@ STDPPLHomCommonProperties::set_status( const DictionaryDatum& d,
 {
   CommonSynapseProperties::set_status( d, cm );
 
-  updateValue< double >( d, names::tau_minus, tau_minus_ );
 #if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
+  updateValue< double >( d, names::tau_minus, tau_minus_ );
   if ( tau_minus_ > 0. )
   {
     tau_minus_inv_ = 1. / tau_minus_;
