@@ -98,10 +98,12 @@ Archiving_Node::register_stdp_connection( double t_first_read )
 double
 nest::Archiving_Node::get_K_value( double t )
 {
-  std::cout << "In Archiving_Node::get_K_value" << std::endl;
+  std::cout << "In Archiving_Node::get_K_value(t=" << t <<")" << std::endl;
   if ( history_.empty() )
   {
+#ifdef CHARL_DEBUG
     std::cout << "\thistory is empty: returning Kminus_ = " << Kminus_ << std::endl;
+#endif
     return Kminus_;
   }
   int i = history_.size() - 1;
@@ -109,8 +111,10 @@ nest::Archiving_Node::get_K_value( double t )
   {
     if ( t - history_[ i ].t_ > kernel().connection_manager.get_stdp_eps() )
     {
+#ifdef CHARL_DEBUG
       std::cout << "\thistory_[" << i << "].t_ = " << history_[ i ].t_ << ", Kminus_ = " << history_[ i ].Kminus_ << ", returning " << ( history_[ i ].Kminus_
         * std::exp( ( history_[ i ].t_ - t ) * tau_minus_inv_ ) ) << std::endl;
+#endif
       return ( history_[ i ].Kminus_
         * std::exp( ( history_[ i ].t_ - t ) * tau_minus_inv_ ) );
     }
@@ -209,12 +213,18 @@ nest::Archiving_Node::set_spiketime( Time const& t_sp, double offset )
       }
     }
     // update spiking history
+#ifdef CHARL_DEBUG
+    std::cout << "In nest::Archiving_Node::set_spiketime(t_sp = " << t_sp << "): old Kminus_ = " << Kminus_ <<", new Kminus_ = " << (Kminus_ * std::exp( ( last_spike_ - t_sp_ms ) * tau_minus_inv_ ) + 1.0) << std::endl; 
+#endif
     Kminus_ =
       Kminus_ * std::exp( ( last_spike_ - t_sp_ms ) * tau_minus_inv_ ) + 1.0;
     triplet_Kminus_ = triplet_Kminus_
         * std::exp( ( last_spike_ - t_sp_ms ) * tau_minus_triplet_inv_ )
       + 1.0;
     last_spike_ = t_sp_ms;
+#ifdef CHARL_DEBUG
+    std::cout << "\tpush_back history: last_spike_ = " << last_spike_ << ", Kminus_ = " << Kminus_ << std::endl; 
+#endif
     history_.push_back( histentry( last_spike_, Kminus_, triplet_Kminus_, 0 ) );
   }
   else

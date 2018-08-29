@@ -30,6 +30,8 @@
     Please make all changes in config.h.in.
 */
 
+#define CHARL_DEBUG "YES!"
+
 #define NEST_VERSION_PRGNAME "@NEST_VERSION_PRGNAME@"
 
 #define NEST_VERSION_MAJOR_REVISION @NEST_VERSION_MAJOR@
@@ -173,7 +175,7 @@
 
 #define STDP_TEST_NATIVE_NEST   0
 #define STDP_TEST_SYNAPTIC_POST_TRACE   1
-#define STDP_TEST   STDP_TEST_NATIVE_NEST
+#define STDP_TEST   STDP_TEST_SYNAPTIC_POST_TRACE
 
 
 #endif // #ifndef CONFIG_H
