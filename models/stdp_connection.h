@@ -201,6 +201,7 @@ private:
 	double tau_minus_;
 	double tau_minus_inv_;
 	double t_last_post_spike_;
+	unsigned int post_pre_spikes_precisely_coincident;
 #endif
 
 	double t_lastspike_;
@@ -223,7 +224,21 @@ STDPConnection< targetidentifierT >::send( Event& e,
 	// synapse STDP depressing/facilitation dynamics
 	double t_spike = e.get_stamp().get_ms();
 
-	std::cout << "In STDPConnection::send(): t_spike = " <<t_spike<< std::endl;
+	std::cout << "* In STDPConnection::send(): t_spike = " <<t_spike<< std::endl;
+
+
+#ifdef CHARL_DEBUG
+	std::cout << "\t\t  bump due to post-pre coincidences? t_spike = " << t_spike <<  ", t_lastspike = " << t_lastspike_ << std::endl;
+#endif
+
+
+	if (t_lastspike_ > 0 && t_spike > t_lastspike_)
+	{
+		// bump the trace due to a spike at time `start->t_`
+		Kminus_ += post_pre_spikes_precisely_coincident;
+		post_pre_spikes_precisely_coincident = 0.;
+	}
+
 	// use accessor functions (inherited from Connection< >) to obtain delay and
 	// target
 	Node* target = get_target( t );
@@ -241,7 +256,7 @@ STDPConnection< targetidentifierT >::send( Event& e,
 	// history[0, ..., t_last_spike - dendritic_delay] have been
 	// incremented by Archiving_Node::register_stdp_connection(). See bug #218 for
 	// details.
-	std::cout << "* requesting post history from t = " << t_last_post_spike_ - dendritic_delay << " and " << t_spike - dendritic_delay << std::endl;
+	std::cout << "\t* requesting post history from t = " << t_last_post_spike_ - dendritic_delay << " and " << t_spike - dendritic_delay << std::endl;
 
 #if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
 	target->get_history( t_last_post_spike_,
@@ -249,68 +264,70 @@ STDPConnection< targetidentifierT >::send( Event& e,
 		&start,
 		&finish );
 #ifdef CHARL_DEBUG
-	std::cout << "* In STDPConnection::send(): updating Kminus_" << std::endl;
-	std::cout << "  dendritic_delay = " << dendritic_delay << std::endl;
-	std::cout << "  tau_minus_inv_ = " << tau_minus_inv_ << std::endl;
+	std::cout << "\t* In STDPConnection::send(): updating Kminus_" << std::endl;
+	std::cout << "\t  dendritic_delay = " << dendritic_delay << std::endl;
+	std::cout << "\t  tau_minus_inv_ = " << tau_minus_inv_ << std::endl;
 	if (start == finish)
 	{
 		std::cout << "  no new postsynaptic spikes" << std::endl;
 	}
 #endif
 
-	
-
 	while ( start != finish )
 	{
 #ifdef CHARL_DEBUG
-		std::cout << "\t* iterator->t_ = " << start->t_ << std::endl;
+		std::cout << "\t\t* iterator->t_ = " << start->t_ << std::endl;
 #endif
 
 		// update the trace from time `t_last_post_spike_` to time `start->t_`
 		if (t_last_post_spike_ > 0.)//} && start->t_ < t_spike - dendritic_delay)
 		{
 #ifdef CHARL_DEBUG
-			std::cout << "\t\t* updating Kminus_ from t = " << t_last_post_spike_ << " to " << start->t_ << " (dt = " << start->t_ - t_last_post_spike_ << ")" << std::endl;
-			std::cout << "\t\t  t_last_post_spike_ = " << t_last_post_spike_ << std::endl;
-			std::cout << "\t\t  old Kminus_ = " << Kminus_ << std::endl;
+			std::cout << "\t\t\t* updating Kminus_ from t = " << t_last_post_spike_ << " to " << start->t_ << " (dt = " << start->t_ - t_last_post_spike_ << ")" << std::endl;
+			std::cout << "\t\t\t  t_last_post_spike_ = " << t_last_post_spike_ << std::endl;
+			std::cout << "\t\t\t  old Kminus_ = " << Kminus_ << std::endl;
 #endif
 			Kminus_ *= std::exp( -( start->t_ - t_last_post_spike_ ) * tau_minus_inv_ );
-			if (start->t_ > t_spike - dendritic_delay)	// if pre- and post-spikes are not precisely at the same time...
-			{
-				Kminus_ += 1.;
-			}
+		}
+
+		if (start->t_ < t_spike - dendritic_delay)	// if pre- and post-spikes are not precisely at the same time...
+		{
+			// bump the trace due to a spike at time `start->t_`
+			Kminus_ += 1.;
+		}
+		else {
+			post_pre_spikes_precisely_coincident += 1;
+		}
 
 #ifdef CHARL_DEBUG
-			std::cout << "\t\t  new Kminus_ = " << Kminus_ << std::endl;
+		std::cout << "\t\t\t  new Kminus_ = " << Kminus_ << std::endl;
 #endif
-		}
-		else
-		{
-			Kminus_ = 1.;
-		}
 
 		t_last_post_spike_ = start->t_;
 
 #ifdef CHARL_DEBUG
-		std::cout << "\t  updating t_last_post_spike_ to " << t_last_post_spike_ << std::endl;
+		std::cout << "\t\t  updating t_last_post_spike_ to " << t_last_post_spike_ << std::endl;
 #endif
 
 		++start;
 	}
 
-	// update from the last received postsynaptic spike to the time of the presynaptic spike we're currently processing (t_spike)
-	std::cout << "\t  * updating Kminus_ from t = " << t_last_post_spike_ << " to " << t_spike  - dendritic_delay << " (dt = " << t_spike - dendritic_delay - t_last_post_spike_ << ")" << std::endl;
-	double Kminus_at_pre_spike = Kminus_ * std::exp( -( t_spike - dendritic_delay - t_last_post_spike_ ) * tau_minus_inv_ );
-	// t_last_post_spike_ = t_spike;	// XXX: XXXXXXXXXXXXXX
+	double Kminus_at_pre_spike = 0.;
+
+	if (t_last_post_spike_ > 0.)
+	{
+		// update from the last received postsynaptic spike to the time of the presynaptic spike we're currently processing (t_spike)
+		std::cout << "\t\t  * updating Kminus_ from t = " << t_last_post_spike_ << " to " << t_spike  - dendritic_delay << " (dt = " << t_spike - dendritic_delay - t_last_post_spike_ << ")" << std::endl;
+		Kminus_at_pre_spike = Kminus_ * std::exp( -( t_spike - dendritic_delay - t_last_post_spike_ ) * tau_minus_inv_ );
+	}
 
 #ifdef CHARL_DEBUG
-	std::cout << "\t  Kminus_ at time of presynaptic spike arrival = " << Kminus_at_pre_spike << std::endl;
+	std::cout << "\t\t  Kminus_ at time of presynaptic spike arrival = " << Kminus_at_pre_spike << std::endl;
 #endif
 
 #endif
 
-
-
+	
 	target->get_history( t_lastspike_ - dendritic_delay,
 		t_spike - dendritic_delay,
 		&start,
@@ -338,11 +355,12 @@ STDPConnection< targetidentifierT >::send( Event& e,
 
 	// depression due to new pre-synaptic spike
 #if (STDP_TEST == STDP_TEST_NATIVE_NEST)
-	std::cout << "In STDPConnection::send(): calling target->get_K_value()" << std::endl;
+	std::cout << "\t* Calling target->get_K_value()" << std::endl;
 	double Kminus_at_pre_spike = target->get_K_value( t_spike - dendritic_delay );
 #elif STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
 #ifdef CHARL_DEBUG
 	double _Kminus_from_archiving_node = target->get_K_value( t_spike - dendritic_delay );
+	std::cout << "\t   --> _Kminus_from_archiving_node = " << _Kminus_from_archiving_node << std::endl;
 	assert(abs(_Kminus_from_archiving_node - Kminus_at_pre_spike) < 1E-12);
 #endif
 #endif
@@ -379,6 +397,7 @@ STDPConnection< targetidentifierT >::STDPConnection()
 #if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
 	, Kminus_( 0.0 )
 	, t_last_post_spike_( -1. )
+	, post_pre_spikes_precisely_coincident ( 0. )
 #endif  
 	, t_lastspike_( 0.0 )
 {
@@ -401,6 +420,7 @@ STDPConnection< targetidentifierT >::STDPConnection(
 	, tau_minus_inv_( rhs.tau_minus_inv_ )
 	, Kminus_( rhs.Kminus_ )
 	, t_last_post_spike_( rhs.t_last_post_spike_ )
+	, post_pre_spikes_precisely_coincident ( rhs.post_pre_spikes_precisely_coincident )
 #endif
 	, t_lastspike_( rhs.t_lastspike_ )
 {
