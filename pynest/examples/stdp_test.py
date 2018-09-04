@@ -53,8 +53,8 @@ class StdpSynapse(unittest.TestCase):
         # pre_spike_times = [   4.,   6.  , 6.]    # [ms]
         # post_spike_times = [  2.,   6. ]      # [ms]
 
-        pre_spike_times = 1 + np.round(100 * np.sort(np.abs(np.random.randn(10000))))      # [ms]
-        post_spike_times =  np.sort(np.unique(1 + np.round(100 * np.sort(np.abs(np.random.randn(10000))))))      # [ms]
+        pre_spike_times = 1 + np.round(100 * np.sort(np.abs(np.random.randn(100))))      # [ms]
+        post_spike_times =  np.sort(np.unique(1 + np.round(100 * np.sort(np.abs(np.random.randn(100))))))     # [ms]
 
         print("Pre spike times: " + str(pre_spike_times))
         print("Post spike times: " + str(post_spike_times))
