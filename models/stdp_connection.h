@@ -222,6 +222,7 @@ STDPConnection< targetidentifierT >::send( Event& e,
 	const CommonSynapseProperties& )
 {
 	// synapse STDP depressing/facilitation dynamics
+	double minus_dt;
 	double t_spike = e.get_stamp().get_ms();
 
 	std::cout << "* In STDPConnection::send(): t_spike = " <<t_spike<< std::endl;
@@ -259,7 +260,7 @@ STDPConnection< targetidentifierT >::send( Event& e,
 	std::cout << "\t* requesting post history from t = " << t_last_post_spike_ - dendritic_delay << " and " << t_spike - dendritic_delay << std::endl;
 
 #if STDP_TEST == STDP_TEST_SYNAPTIC_POST_TRACE
-	target->get_history( t_last_post_spike_,
+	target->get_history( fmin(t_lastspike_ - dendritic_delay, t_last_post_spike_), 
 		t_spike - dendritic_delay,
 		&start,
 		&finish );
@@ -267,10 +268,10 @@ STDPConnection< targetidentifierT >::send( Event& e,
 	std::cout << "\t* In STDPConnection::send(): updating Kminus_" << std::endl;
 	std::cout << "\t  dendritic_delay = " << dendritic_delay << std::endl;
 	std::cout << "\t  tau_minus_inv_ = " << tau_minus_inv_ << std::endl;
-	if (start == finish)
-	{
-		std::cout << "  no new postsynaptic spikes" << std::endl;
-	}
+	// if (start == finish)
+	// {
+		// std::cout << "  no new postsynaptic spikes" << std::endl;
+	// }
 #endif
 
 	while ( start != finish )
@@ -279,35 +280,51 @@ STDPConnection< targetidentifierT >::send( Event& e,
 		std::cout << "\t\t* iterator->t_ = " << start->t_ << std::endl;
 #endif
 
-		// update the trace from time `t_last_post_spike_` to time `start->t_`
-		if (t_last_post_spike_ > 0.)//} && start->t_ < t_spike - dendritic_delay)
+		if (start->t_ > t_last_post_spike_)
 		{
-#ifdef CHARL_DEBUG
-			std::cout << "\t\t\t* updating Kminus_ from t = " << t_last_post_spike_ << " to " << start->t_ << " (dt = " << start->t_ - t_last_post_spike_ << ")" << std::endl;
-			std::cout << "\t\t\t  t_last_post_spike_ = " << t_last_post_spike_ << std::endl;
-			std::cout << "\t\t\t  old Kminus_ = " << Kminus_ << std::endl;
-#endif
-			Kminus_ *= std::exp( -( start->t_ - t_last_post_spike_ ) * tau_minus_inv_ );
+
+			// update the trace from time `t_last_post_spike_` to time `start->t_`
+			if (t_last_post_spike_ > 0.)//} && start->t_ < t_spike - dendritic_delay)
+			{
+	#ifdef CHARL_DEBUG
+				std::cout << "\t\t\t* updating Kminus_ from t = " << t_last_post_spike_ << " to " << start->t_ << " (dt = " << start->t_ - t_last_post_spike_ << ")" << std::endl;
+				std::cout << "\t\t\t  t_last_post_spike_ = " << t_last_post_spike_ << std::endl;
+				std::cout << "\t\t\t  old Kminus_ = " << Kminus_ << std::endl;
+	#endif
+				Kminus_ *= std::exp( -( start->t_ - t_last_post_spike_ ) * tau_minus_inv_ );
+			}
+
+			if (start->t_ < t_spike - dendritic_delay)	// if pre- and post-spikes are not precisely at the same time...
+			{
+				// bump the trace due to a spike at time `start->t_`
+				Kminus_ += 1.;
+			}
+			else {
+				post_pre_spikes_precisely_coincident += 1;
+			}
+
+	#ifdef CHARL_DEBUG
+			std::cout << "\t\t\t  new Kminus_ = " << Kminus_ << std::endl;
+	#endif
+
+			t_last_post_spike_ = start->t_;
+
+	#ifdef CHARL_DEBUG
+			std::cout << "\t\t  updating t_last_post_spike_ to " << t_last_post_spike_ << std::endl;
+	#endif
+
 		}
 
-		if (start->t_ < t_spike - dendritic_delay)	// if pre- and post-spikes are not precisely at the same time...
+		// facilitation due to post-synaptic spikes since last pre-synaptic spike
+		if (start->t_ > t_lastspike_ - dendritic_delay) 
 		{
-			// bump the trace due to a spike at time `start->t_`
-			Kminus_ += 1.;
+			minus_dt = t_lastspike_ - ( start->t_ + dendritic_delay );
+			// get_history() should make sure that
+			// start->t_ > t_lastspike - dendritic_delay, i.e. minus_dt < 0
+			assert( minus_dt < -1.0 * kernel().connection_manager.get_stdp_eps() );
+			weight_ = facilitate_( weight_, Kplus_ * std::exp( minus_dt / tau_plus_ ) );
+
 		}
-		else {
-			post_pre_spikes_precisely_coincident += 1;
-		}
-
-#ifdef CHARL_DEBUG
-		std::cout << "\t\t\t  new Kminus_ = " << Kminus_ << std::endl;
-#endif
-
-		t_last_post_spike_ = start->t_;
-
-#ifdef CHARL_DEBUG
-		std::cout << "\t\t  updating t_last_post_spike_ to " << t_last_post_spike_ << std::endl;
-#endif
 
 		++start;
 	}
@@ -328,22 +345,21 @@ STDPConnection< targetidentifierT >::send( Event& e,
 #endif
 
 	
-	target->get_history( t_lastspike_ - dendritic_delay,
-		t_spike - dendritic_delay,
-		&start,
-		&finish );
-	// facilitation due to post-synaptic spikes since last pre-synaptic spike
-	double minus_dt;
+	// target->get_history( t_lastspike_ - dendritic_delay,
+	// 	t_spike - dendritic_delay,
+	// 	&start,
+	// 	&finish );
+	// // facilitation due to post-synaptic spikes since last pre-synaptic spike
 
-	while ( start != finish )
-	{
-		minus_dt = t_lastspike_ - ( start->t_ + dendritic_delay );
-		++start;
-		// get_history() should make sure that
-		// start->t_ > t_lastspike - dendritic_delay, i.e. minus_dt < 0
-		assert( minus_dt < -1.0 * kernel().connection_manager.get_stdp_eps() );
-		weight_ = facilitate_( weight_, Kplus_ * std::exp( minus_dt / tau_plus_ ) );
-	}
+	// while ( start != finish )
+	// {
+	// 	minus_dt = t_lastspike_ - ( start->t_ + dendritic_delay );
+	// 	++start;
+	// 	// get_history() should make sure that
+	// 	// start->t_ > t_lastspike - dendritic_delay, i.e. minus_dt < 0
+	// 	assert( minus_dt < -1.0 * kernel().connection_manager.get_stdp_eps() );
+	// 	weight_ = facilitate_( weight_, Kplus_ * std::exp( minus_dt / tau_plus_ ) );
+	// }
 
 
 
