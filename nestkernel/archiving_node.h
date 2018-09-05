@@ -195,7 +195,19 @@ protected:
    */
   void clear_history();
 
+
+  template <typename T>
+  size_t register_trace(Name n, std::map<Name, double> &parms);
+
+  void update_traces(Time const& t_sp);
+
+  double get_trace_value(Name n, Time const& t_sp);
+
+
 private:
+
+  std::vector< std::reference_wrapper< Trace > > traces;
+
   // number of incoming connections from stdp connectors.
   // needed to determine, if every incoming connection has
   // read the spikehistory for a given point in time

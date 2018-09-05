@@ -95,6 +95,20 @@ Archiving_Node::register_stdp_connection( double t_first_read )
   n_incoming_++;
 }
 
+
+template <typename T>
+size_t register_trace(Name n, std::map<Name, double> &parms)
+{
+  // XXX: TODO: check if name, parms combinatiton has already occurred
+  traces.push_back(new T(parms));
+}
+
+
+double get_trace_value(Name n, Time const& t_sp) {
+  return traces[n].getTraceValue(t_sp);
+}
+
+
 double
 nest::Archiving_Node::get_K_value( double t )
 {
@@ -182,11 +196,19 @@ nest::Archiving_Node::get_history( double t1,
   }
 }
 
+void 
+nest::Archiving_Node::update_traces( Time const& t_sp ) {
+  for (std::reference_wrapper< Trace > tr& : traces) {
+    traces.updateTrace(t_sp);
+  }
+}
+
 void
 nest::Archiving_Node::set_spiketime( Time const& t_sp, double offset )
 {
   const double t_sp_ms = t_sp.get_ms() - offset;
   update_synaptic_elements( t_sp_ms );
+  update_traces( t_sp );
   Ca_minus_ += beta_Ca_;
 
   if ( n_incoming_ )

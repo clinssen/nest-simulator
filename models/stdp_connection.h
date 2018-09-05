@@ -162,6 +162,11 @@ public:
 
     ConnectionBase::check_connection_( dummy_target, s, t, receptor_type );
 
+    s.register_trace<ExponentialAllToAllTrace>( names::tau_plus, tau_plus_ );
+    t.register_trace<ExponentialAllToAllTrace>( names::tau_minu, tau_plus_ );
+    s.register_trace<ExponentialNearestNeighbourTrace>( names::tau_plus, tau_minus_ );
+    t.register_trace<ExponentialNearestNeighbourTrace>( names::tau_minu, tau_minus_ );
+
     t.register_stdp_connection( t_lastspike_ - get_delay() );
   }
 
