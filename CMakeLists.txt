@@ -120,6 +120,7 @@ include( CPackVariables )
 include( CheckExtraCompilerFeatures )
 include( ConfigureSummary )
 include( GetTriple )
+include( scalasca )
 
 # get triples arch-vendor-os
 get_host_triple( NEST_HOST_TRIPLE NEST_HOST_ARCH NEST_HOST_VENDOR NEST_HOST_OS )
