@@ -97,15 +97,21 @@ Archiving_Node::register_stdp_connection( double t_first_read )
 
 
 template <typename T>
-size_t register_trace(Name n, std::map<Name, double> &parms)
+size_t nest::Archiving_Node::register_trace(Name n, std::map<Name, double> &parms)
 {
-  // XXX: TODO: check if name, parms combinatiton has already occurred
-  traces.push_back(new T(parms));
+    // XXX: TODO: check if name, parms combinatiton has already occurred
+    T *t = new T(parms);
+    std::cout << "* In Archiving_Node::register_trace(): emplacing " << n <<std::endl;
+//    traces.emplace(n, std::ref<T>(t));
+    traces.emplace(n, t);
+    return traces.size() - 1;
 }
 
 
-double get_trace_value(Name n, Time const& t_sp) {
-  return traces[n].getTraceValue(t_sp);
+double nest::Archiving_Node::get_trace_value(Name n, Time const& t_sp) {
+  //return ((Trace*)traces[n])->getTraceValue(t_sp);
+  //std::cout << "* In Archiving_Node::get_trace_value(): trace name = " << n << ", t = " << t_sp << ", val = " << traces[n].get().getTraceValue(t_sp)<< std::endl;
+  return traces[n]->getTraceValue(t_sp);
 }
 
 
@@ -196,10 +202,10 @@ nest::Archiving_Node::get_history( double t1,
   }
 }
 
-void 
+void
 nest::Archiving_Node::update_traces( Time const& t_sp ) {
-  for (std::reference_wrapper< Trace > tr& : traces) {
-    traces.updateTrace(t_sp);
+  for (auto &kv : traces) { // `auto` == std::pair< Name, std::reference_wrapper< Trace > >
+    kv.second->updateTrace(t_sp);
   }
 }
 

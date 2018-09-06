@@ -39,6 +39,7 @@
 #include "nest_time.h"
 #include "nest_types.h"
 #include "node.h"
+#include "trace.h"
 #include "synaptic_element.h"
 
 // Includes from sli:
@@ -203,10 +204,10 @@ protected:
 
   double get_trace_value(Name n, Time const& t_sp);
 
+  //std::map< Name, std::reference_wrapper< Trace > > traces;
+  std::map< Name, Trace* > traces;
 
 private:
-
-  std::vector< std::reference_wrapper< Trace > > traces;
 
   // number of incoming connections from stdp connectors.
   // needed to determine, if every incoming connection has
