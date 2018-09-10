@@ -460,6 +460,8 @@ const Name to_file( "to_file" );
 const Name to_memory( "to_memory" );
 const Name to_screen( "to_screen" );
 const Name total_num_virtual_procs( "total_num_virtual_procs" );
+const Name trace_minus("trace_minus");
+const Name trace_plus("trace_plus");
 const Name Tstart( "Tstart" );
 const Name Tstop( "Tstop" );
 const Name type_id( "type_id" );

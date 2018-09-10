@@ -95,20 +95,9 @@ Archiving_Node::register_stdp_connection( double t_first_read )
   n_incoming_++;
 }
 
+//template class nest::Archiving_Node::register_trace<Trace*>;
 
-template <typename T>
-size_t nest::Archiving_Node::register_trace(Name n, std::map<Name, double> &parms)
-{
-    // XXX: TODO: check if name, parms combinatiton has already occurred
-    T *t = new T(parms);
-    std::cout << "* In Archiving_Node::register_trace(): emplacing " << n <<std::endl;
-//    traces.emplace(n, std::ref<T>(t));
-    traces.emplace(n, t);
-    return traces.size() - 1;
-}
-
-
-double nest::Archiving_Node::get_trace_value(Name n, Time const& t_sp) {
+double nest::Archiving_Node::get_trace_value(const Name &n, Time const& t_sp) {
   //return ((Trace*)traces[n])->getTraceValue(t_sp);
   //std::cout << "* In Archiving_Node::get_trace_value(): trace name = " << n << ", t = " << t_sp << ", val = " << traces[n].get().getTraceValue(t_sp)<< std::endl;
   return traces[n]->getTraceValue(t_sp);

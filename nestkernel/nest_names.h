@@ -479,6 +479,8 @@ extern const Name to_file;
 extern const Name to_memory;
 extern const Name to_screen;
 extern const Name total_num_virtual_procs;
+extern const Name trace_minus;
+extern const Name trace_plus;
 extern const Name Tstart;
 extern const Name Tstop;
 extern const Name type_id;

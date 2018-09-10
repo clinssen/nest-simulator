@@ -80,14 +80,17 @@
 #include "connection.h"
 #include "connector_model.h"
 #include "event.h"
+#include "archiving_node.h"
 
 // Includes from sli:
 #include "dictdatum.h"
 #include "dictutils.h"
 
-
 namespace nest
 {
+
+    class Archiving_Node;
+
 
 // connections are templates of target identifier type (used for pointer /
 // target index addressing) derived from generic connection template
@@ -162,10 +165,19 @@ public:
 
     ConnectionBase::check_connection_( dummy_target, s, t, receptor_type );
 
-    s.register_trace<ExponentialAllToAllTrace>( names::tau_plus, tau_plus_ );
-    t.register_trace<ExponentialAllToAllTrace>( names::tau_minu, tau_plus_ );
-    s.register_trace<ExponentialNearestNeighbourTrace>( names::tau_plus, tau_minus_ );
-    t.register_trace<ExponentialNearestNeighbourTrace>( names::tau_minu, tau_minus_ );
+    Archiving_Node &_s = dynamic_cast<Archiving_Node&>(s);
+    Archiving_Node &_t = dynamic_cast<Archiving_Node&>(t);
+
+    DictionaryDatum _parms_dict_plus = new Dictionary();
+    def<double>(_parms_dict_plus, names::tau_plus, tau_plus_);
+
+    DictionaryDatum _parms_dict_minus = new Dictionary();
+    def<double>(_parms_dict_minus, names::tau_minus, tau_minus_);
+
+    _s.register_trace<ExponentialAllToAllTrace>( names::trace_plus, _parms_dict_plus );
+    _t.register_trace<ExponentialAllToAllTrace>( names::trace_plus, _parms_dict_plus );
+    //_s.register_trace<ExponentialNearestNeighbourTrace>( names::trace_minus, _parms_dict_minus );
+    //_t.register_trace<ExponentialNearestNeighbourTrace>( names::trace_minus, _parms_dict_minus );
 
     t.register_stdp_connection( t_lastspike_ - get_delay() );
   }
@@ -196,6 +208,7 @@ private:
   // data members of each connection
   double weight_;
   double tau_plus_;
+  double tau_minus_;
   double lambda_;
   double alpha_;
   double mu_plus_;

@@ -20,6 +20,7 @@
 set( nestkernel_sources
     universal_data_logger_impl.h universal_data_logger.h
     recordables_map.h
+    trace.h exponential_all_to_all_trace.h exponential_all_to_all_trace.cpp
     archiving_node.h archiving_node.cpp
     common_synapse_properties.h common_synapse_properties.cpp
     completed_checker.h completed_checker.cpp

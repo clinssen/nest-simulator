@@ -33,6 +33,7 @@
 
 // C++ includes:
 #include <deque>
+#include <map>
 
 // Includes from nestkernel:
 #include "histentry.h"
@@ -40,6 +41,7 @@
 #include "nest_types.h"
 #include "node.h"
 #include "trace.h"
+#include "exponential_all_to_all_trace.h"
 #include "synaptic_element.h"
 
 // Includes from sli:
@@ -177,6 +179,26 @@ public:
    */
   double get_tau_Ca() const;
 
+
+
+    template <typename T>
+    size_t register_trace(const Name &n, const DictionaryDatum &parms)
+    {
+        // XXX: TODO: check if name, parms combination has already occurred
+        T *tr = new T(parms);
+        std::cout << "* In Archiving_Node::register_trace(): emplacing " << n << std::endl;
+    //    traces.emplace(n, std::ref<T>(t));
+        traces.emplace(n, tr);
+        return traces.size() - 1;
+    }
+
+    void update_traces(Time const& t_sp);
+
+    double get_trace_value(const Name &n, Time const& t_sp);
+
+
+
+
 protected:
   /**
    * \fn void set_spiketime(Time const & t_sp, double offset)
@@ -196,16 +218,6 @@ protected:
    */
   void clear_history();
 
-
-  template <typename T>
-  size_t register_trace(Name n, std::map<Name, double> &parms);
-
-  void update_traces(Time const& t_sp);
-
-  double get_trace_value(Name n, Time const& t_sp);
-
-  //std::map< Name, std::reference_wrapper< Trace > > traces;
-  std::map< Name, Trace* > traces;
 
 private:
 
@@ -254,6 +266,13 @@ private:
 
   // Map of the synaptic elements
   std::map< Name, SynapticElement > synaptic_elements_map_;
+
+
+
+    //std::map< Name, std::reference_wrapper< Trace > > traces;
+    std::map< Name, Trace* > traces;
+
+
 };
 
 inline double
