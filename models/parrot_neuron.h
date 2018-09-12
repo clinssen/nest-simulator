@@ -20,8 +20,21 @@
  *
  */
 
+#ifndef PARROT_NEURON_H
+#define PARROT_NEURON_H
 
-/* BeginDocumentation
+// Includes from nestkernel:
+#include "archiving_node.h"
+#include "connection.h"
+#include "event.h"
+#include "nest_types.h"
+#include "ring_buffer.h"
+
+namespace nest
+{
+
+
+/**
 Name: parrot_neuron - Neuron that repeats incoming spikes.
 
 Description:
@@ -59,27 +72,6 @@ Plesser
 FirstVersion: May 2006
 */
 
-
-/**
- * The parrot neuron emits one spike for every incoming spike,
- * but may use multiplicity to indicate number of spikes in a single
- * time step.
- * Instead of the accumulated weigths of the incoming spikes, the
- * number of the spikes is stored within a ring buffer.
- */
-
-#ifndef PARROT_NEURON_H
-#define PARROT_NEURON_H
-
-// Includes from nestkernel:
-#include "archiving_node.h"
-#include "connection.h"
-#include "event.h"
-#include "nest_types.h"
-#include "ring_buffer.h"
-
-namespace nest
-{
 class parrot_neuron : public Archiving_Node
 {
 

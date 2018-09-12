@@ -79,12 +79,14 @@
 #include "common_synapse_properties.h"
 #include "connection.h"
 #include "connector_model.h"
+#include "nest_time.h"
 #include "event.h"
 #include "archiving_node.h"
 
 // Includes from sli:
 #include "dictdatum.h"
 #include "dictutils.h"
+
 
 namespace nest
 {
@@ -269,8 +271,10 @@ STDPConnection< targetidentifierT >::send( Event& e,
   }
 
   // depression due to new pre-synaptic spike
+  double _K_value = target->get_K_value( t_spike - dendritic_delay );
+  assert(_K_value == dynamic_cast<Archiving_Node*>(target)->get_trace_value( names::trace_plus, Time::ms(t_spike - dendritic_delay) ));
   weight_ =
-    depress_( weight_, target->get_K_value( t_spike - dendritic_delay ) );
+    depress_( weight_, _K_value );
 
   e.set_receiver( *target );
   e.set_weight( weight_ );

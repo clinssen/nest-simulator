@@ -192,9 +192,12 @@ public:
         return traces.size() - 1;
     }
 
+    /**
+     * update traces of this node due to a spike at t = t_sp
+    **/
     void update_traces(Time const& t_sp);
 
-    double get_trace_value(const Name &n, Time const& t_sp);
+    double get_trace_value(const Name &n, const Time& t_sp);
 
 
 

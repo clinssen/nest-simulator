@@ -97,7 +97,7 @@ Archiving_Node::register_stdp_connection( double t_first_read )
 
 //template class nest::Archiving_Node::register_trace<Trace*>;
 
-double nest::Archiving_Node::get_trace_value(const Name &n, Time const& t_sp) {
+double nest::Archiving_Node::get_trace_value(const Name &n, const Time& t_sp) {
   //return ((Trace*)traces[n])->getTraceValue(t_sp);
   //std::cout << "* In Archiving_Node::get_trace_value(): trace name = " << n << ", t = " << t_sp << ", val = " << traces[n].get().getTraceValue(t_sp)<< std::endl;
   return traces[n]->getTraceValue(t_sp);
@@ -193,14 +193,16 @@ nest::Archiving_Node::get_history( double t1,
 
 void
 nest::Archiving_Node::update_traces( Time const& t_sp ) {
-  for (auto &kv : traces) { // `auto` == std::pair< Name, std::reference_wrapper< Trace > >
-    kv.second->updateTrace(t_sp);
-  }
+    std::cout << "* Updating traces to register spike at t = " << t_sp << std::endl;
+    for (auto &kv : traces) { // `auto` == std::pair< Name, std::reference_wrapper< Trace > >
+        kv.second->updateTrace(t_sp);
+    }
 }
 
 void
 nest::Archiving_Node::set_spiketime( Time const& t_sp, double offset )
 {
+    std::cout << "XXX: Archiving_Node::set_spiketime\n";
   const double t_sp_ms = t_sp.get_ms() - offset;
   update_synaptic_elements( t_sp_ms );
   update_traces( t_sp );
@@ -221,7 +223,7 @@ nest::Archiving_Node::set_spiketime( Time const& t_sp, double offset )
         break;
       }
     }
-    // update spiking history
+
     Kminus_ =
       Kminus_ * std::exp( ( last_spike_ - t_sp_ms ) * tau_minus_inv_ ) + 1.0;
     triplet_Kminus_ = triplet_Kminus_
