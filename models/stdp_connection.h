@@ -176,8 +176,10 @@ public:
     DictionaryDatum _parms_dict_minus = new Dictionary();
     def<double>(_parms_dict_minus, names::tau_minus, tau_minus_);
 
-    _s.register_trace<ExponentialAllToAllTrace>( names::trace_plus, _parms_dict_plus );
-    _t.register_trace<ExponentialAllToAllTrace>( names::trace_plus, _parms_dict_plus );
+    //_s.register_trace<ExponentialAllToAllTrace>( names::trace_plus, _parms_dict_plus );
+    //_t.register_trace<ExponentialAllToAllTrace>( names::trace_plus, _parms_dict_plus );
+    _s.register_trace( names::trace_plus, tau_plus_, false );
+    _t.register_trace( names::trace_plus, tau_plus_, false );
     //_s.register_trace<ExponentialNearestNeighbourTrace>( names::trace_minus, _parms_dict_minus );
     //_t.register_trace<ExponentialNearestNeighbourTrace>( names::trace_minus, _parms_dict_minus );
 
@@ -272,7 +274,15 @@ STDPConnection< targetidentifierT >::send( Event& e,
 
   // depression due to new pre-synaptic spike
   double _K_value = target->get_K_value( t_spike - dendritic_delay );
-  assert(_K_value == dynamic_cast<Archiving_Node*>(target)->get_trace_value( names::trace_plus, Time::ms(t_spike - dendritic_delay) ));
+//  assert(_K_value == dynamic_cast<Archiving_Node*>(target)->get_trace_value( names::trace_plus, Time::ms(t_spike - dendritic_delay) ));
+
+
+  double tr;
+  dynamic_cast<Archiving_Node*>(target)->get_trace_values(Time::ms(t_spike - dendritic_delay), &tr);
+  std::cout << "\t --> the trace value returned by the Archiving_Node = " << tr <<  std::endl;
+  assert(_K_value == tr);
+
+
   weight_ =
     depress_( weight_, _K_value );
 

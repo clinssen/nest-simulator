@@ -40,9 +40,10 @@
 #include "nest_time.h"
 #include "nest_types.h"
 #include "node.h"
-#include "trace.h"
-#include "exponential_all_to_all_trace.h"
+//#include "trace.h"
+//#include "exponential_all_to_all_trace.h"
 #include "synaptic_element.h"
+#include "kernel_manager.h"
 
 // Includes from sli:
 #include "dictdatum.h"
@@ -179,8 +180,8 @@ public:
    */
   double get_tau_Ca() const;
 
-
-
+  size_t register_trace(const Name &n, double tau, bool reset);
+/*
     template <typename T>
     size_t register_trace(const Name &n, const DictionaryDatum &parms)
     {
@@ -191,16 +192,44 @@ public:
         traces.emplace(n, tr);
         return traces.size() - 1;
     }
-
+*/
     /**
      * update traces of this node due to a spike at t = t_sp
     **/
-    void update_traces(Time const& t_sp);
+    //void update_traces(Time const& t_sp);
 
-    double get_trace_value(const Name &n, const Time& t_sp);
+    void get_trace_values(const Time& t, double *tr) {
+        std::cout << "* In Archiving_Node::get_trace_values(t = " << t.get_ms() << ")" << std::endl;
+        if ( history_.empty() )
+        {
+            std::cout << "\thistory is empty" << std::endl;
+            for (size_t i = 0; i < n_traces; ++i) {
+                tr[i] = this->traces[i];
+            }
+        }
+        else
+        {
+            int spike_idx = history_.size() - 1;
+            while ( spike_idx >= 0 )
+            {
+              if ( t.get_ms() - history_[ spike_idx ].t_ > kernel().connection_manager.get_stdp_eps() )
+              {
+                  for (size_t i = 0; i < n_traces; ++i) {
+                    tr[i] = ( history_[ spike_idx ].Kminus_
+                            * std::exp( ( history_[ spike_idx ].t_ - t.get_ms() ) * traces_tau_inv[i] ) );
+                    std::cout << "\ttr[" << i << "] = " << tr[i] << ")" << std::endl;
 
-
-
+                  }
+                  return;
+              }
+              --spike_idx;
+            }
+            std::cout << "\tfall-through" << std::endl;
+            for (size_t i = 0; i < n_traces; ++i) {
+                tr[i] = 0.;
+            }
+        }
+    }
 
 protected:
   /**
@@ -267,13 +296,19 @@ private:
   // Increase in calcium concentration [Ca2+] for each spike of the neuron
   double beta_Ca_;
 
+  std::vector<double> trace_property_tau;
+  std::vector<double> traces_tau_inv;
+  std::vector <bool> trace_types;
+  std::vector<double> traces;
+  size_t n_traces;
+
   // Map of the synaptic elements
   std::map< Name, SynapticElement > synaptic_elements_map_;
 
 
 
     //std::map< Name, std::reference_wrapper< Trace > > traces;
-    std::map< Name, Trace* > traces;
+//    std::map< Name, Trace* > traces;
 
 
 };

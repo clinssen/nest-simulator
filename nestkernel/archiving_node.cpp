@@ -53,6 +53,7 @@ nest::Archiving_Node::Archiving_Node()
   , Ca_minus_( 0.0 )
   , tau_Ca_( 10000.0 )
   , beta_Ca_( 0.001 )
+  , n_traces( 0 )
   , synaptic_elements_map_()
 {
 }
@@ -71,6 +72,7 @@ nest::Archiving_Node::Archiving_Node( const Archiving_Node& n )
   , Ca_minus_( n.Ca_minus_ )
   , tau_Ca_( n.tau_Ca_ )
   , beta_Ca_( n.beta_Ca_ )
+  , n_traces ( n.n_traces )
   , synaptic_elements_map_( n.synaptic_elements_map_ )
 {
 }
@@ -93,22 +95,37 @@ Archiving_Node::register_stdp_connection( double t_first_read )
   }
 
   n_incoming_++;
+
+
 }
 
 //template class nest::Archiving_Node::register_trace<Trace*>;
 
+size_t nest::Archiving_Node::register_trace(const Name &n, double tau, bool reset)
+{
+    ++n_traces;
+    // XXX: TODO: check if a trace with this name and these properties is already registered
+    trace_property_tau.push_back(tau);
+    traces_tau_inv.push_back(1 / tau);
+    trace_types.push_back(reset);
+    traces.push_back(0.);
+    return traces.size() - 1;
+}
+
+/*
 double nest::Archiving_Node::get_trace_value(const Name &n, const Time& t_sp) {
   //return ((Trace*)traces[n])->getTraceValue(t_sp);
   //std::cout << "* In Archiving_Node::get_trace_value(): trace name = " << n << ", t = " << t_sp << ", val = " << traces[n].get().getTraceValue(t_sp)<< std::endl;
   return traces[n]->getTraceValue(t_sp);
-}
-
+}*/
 
 double
 nest::Archiving_Node::get_K_value( double t )
 {
+  std::cout << "* In Archiving_Node::get_K_value(t = " << t << ")" << std::endl;
   if ( history_.empty() )
   {
+    std::cout << "\thistory is empty: K_value = " << Kminus_ << std::endl;
     return Kminus_;
   }
   int i = history_.size() - 1;
@@ -116,12 +133,15 @@ nest::Archiving_Node::get_K_value( double t )
   {
     if ( t - history_[ i ].t_ > kernel().connection_manager.get_stdp_eps() )
     {
+      std::cout << "\tK_value = " << ( history_[ i ].Kminus_
+        * std::exp( ( history_[ i ].t_ - t ) * tau_minus_inv_ ) ) << std::endl;
       return ( history_[ i ].Kminus_
         * std::exp( ( history_[ i ].t_ - t ) * tau_minus_inv_ ) );
     }
     i--;
   }
-  return 0;
+  std::cout << "\tfall-through: K_value = " << 0. << std::endl;
+  return 0.;
 }
 
 void
@@ -129,11 +149,13 @@ nest::Archiving_Node::get_K_values( double t,
   double& K_value,
   double& triplet_K_value )
 {
+    std::cout << "* In Archiving_Node::get_K_values(t = " << t << ")" << std::endl;
   // case when the neuron has not yet spiked
   if ( history_.empty() )
   {
     triplet_K_value = triplet_Kminus_;
     K_value = Kminus_;
+    std::cout << "\thistory is empty: K_value = " << K_value << std::endl;
     return;
   }
   // case
@@ -146,6 +168,7 @@ nest::Archiving_Node::get_K_values( double t,
         * std::exp( ( history_[ i ].t_ - t ) * tau_minus_triplet_inv_ ) );
       K_value = ( history_[ i ].Kminus_
         * std::exp( ( history_[ i ].t_ - t ) * tau_minus_inv_ ) );
+      std::cout << "\tK_value = " << K_value << std::endl;
       return;
     }
     i--;
@@ -156,6 +179,7 @@ nest::Archiving_Node::get_K_values( double t,
   // return 0.0 for both K values
   triplet_K_value = 0.0;
   K_value = 0.0;
+  std::cout << "\tfall-through: K_value = " << K_value << std::endl;
 }
 
 void
@@ -191,13 +215,13 @@ nest::Archiving_Node::get_history( double t1,
   }
 }
 
-void
+/*void
 nest::Archiving_Node::update_traces( Time const& t_sp ) {
     std::cout << "* Updating traces to register spike at t = " << t_sp << std::endl;
     for (auto &kv : traces) { // `auto` == std::pair< Name, std::reference_wrapper< Trace > >
         kv.second->updateTrace(t_sp);
     }
-}
+}*/
 
 void
 nest::Archiving_Node::set_spiketime( Time const& t_sp, double offset )
@@ -205,7 +229,7 @@ nest::Archiving_Node::set_spiketime( Time const& t_sp, double offset )
     std::cout << "XXX: Archiving_Node::set_spiketime\n";
   const double t_sp_ms = t_sp.get_ms() - offset;
   update_synaptic_elements( t_sp_ms );
-  update_traces( t_sp );
+  //update_traces( t_sp );
   Ca_minus_ += beta_Ca_;
 
   if ( n_incoming_ )
