@@ -163,6 +163,11 @@ public:
     ConnectionBase::check_connection_( dummy_target, s, t, receptor_type );
 
     t.register_stdp_connection( t_lastspike_ - get_delay() );
+    
+    // configure and register the Node_Tracer needed by this connection
+    const Node_Tracer *nt = new Node_Tracer();
+    nt->set_status( names::tau_plus, tau_plus_ );
+    t.register_tracer(nt);
   }
 
   void
@@ -252,7 +257,7 @@ STDPConnection< targetidentifierT >::send( Event& e,
 
   // depression due to new pre-synaptic spike
   weight_ =
-    depress_( weight_, target->get_K_value( t_spike - dendritic_delay ) );
+    depress_( weight_, target->get_node_tracer()->get_K_value( t_spike - dendritic_delay ) );
 
   e.set_receiver( *target );
   e.set_weight( weight_ );

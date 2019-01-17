@@ -53,6 +53,7 @@ set( nestkernel_sources
     multirange.h multirange.cpp
     node.h node.cpp
     nodelist.h nodelist.cpp
+    node_tracer.h node_tracer.cpp
     proxynode.h proxynode.cpp
     recording_device.h recording_device.cpp
     pseudo_recording_device.h
