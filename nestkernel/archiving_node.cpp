@@ -77,10 +77,7 @@ nest::Archiving_Node::Archiving_Node( const Archiving_Node& n )
 void
 Archiving_Node::register_tracer( Node_Tracer const * nodeTracer )
 {
-    const bool tracerAlreadyRegistered = std::find(v.begin(), v.end(), x) != v.end();
-    if (!tracerAlreadyRegistered) {
-        tracers_.push_back(nodeTracer);
-    }
+    tracers_.push_back(nodeTracer);
 }
 
 
@@ -126,19 +123,16 @@ nest::Archiving_Node::set_spiketime( Time const& t_sp, double offset )
         break;
       }
     }
-    // update spiking history
-    Kminus_ =
-      Kminus_ * std::exp( ( last_spike_ - t_sp_ms ) * tau_minus_inv_ ) + 1.0;
-    triplet_Kminus_ = triplet_Kminus_
-        * std::exp( ( last_spike_ - t_sp_ms ) * tau_minus_triplet_inv_ )
-      + 1.0;
-    last_spike_ = t_sp_ms;
-    history_.push_back( histentry( last_spike_, Kminus_, triplet_Kminus_, 0 ) );
   }
   else
   {
     last_spike_ = t_sp_ms;
   }
+
+  for (Node_Tracer *nt : tracers_)
+  {
+    nt->notifySpikeOccurred(t_sp, offset);
+  }    
 }
 
 void

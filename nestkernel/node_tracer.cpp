@@ -169,40 +169,20 @@ nest::Node_Tracer::get_history( double t1,
 }
 
 void
-nest::Node_Tracer::set_spiketime( Time const& t_sp, double offset )
+nest::Node_Tracer::notifySpikeOccurred( Time const& t_sp, double offset )
 {
-  const double t_sp_ms = t_sp.get_ms() - offset;
-  update_synaptic_elements( t_sp_ms );
-  Ca_minus_ += beta_Ca_;
+    const double t_sp_ms = t_sp.get_ms() - offset;
+    update_synaptic_elements( t_sp_ms );
+    Ca_minus_ += beta_Ca_;
 
-  if ( n_incoming_ )
-  {
-    // prune all spikes from history which are no longer needed
-    // except the penultimate one. we might still need it.
-    while ( history_.size() > 1 )
-    {
-      if ( history_.front().access_counter_ >= n_incoming_ )
-      {
-        history_.pop_front();
-      }
-      else
-      {
-        break;
-      }
-    }
     // update spiking history
     Kminus_ =
-      Kminus_ * std::exp( ( last_spike_ - t_sp_ms ) * tau_minus_inv_ ) + 1.0;
+        Kminus_ * std::exp( ( last_spike_ - t_sp_ms ) * tau_minus_inv_ ) + 1.0;
     triplet_Kminus_ = triplet_Kminus_
         * std::exp( ( last_spike_ - t_sp_ms ) * tau_minus_triplet_inv_ )
-      + 1.0;
+        + 1.0;
     last_spike_ = t_sp_ms;
     history_.push_back( histentry( last_spike_, Kminus_, triplet_Kminus_, 0 ) );
-  }
-  else
-  {
-    last_spike_ = t_sp_ms;
-  }
 }
 
 void
