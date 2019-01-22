@@ -157,7 +157,7 @@ iaf_cond_alpha_mc_dynamics( double, const double*, double*, void* );
  * @note All parameters that occur for both compartments
  *       and dendrite are stored as C arrays, with index 0 being soma.
  */
-class iaf_cond_alpha_mc : public Archiving_Node
+class iaf_cond_alpha_mc : public Spiking_Node
 {
 
   // Boilerplate function declarations --------------------------------
@@ -530,7 +530,7 @@ iaf_cond_alpha_mc::get_status( DictionaryDatum& d ) const
 {
   P_.get( d );
   S_.get( d );
-  Archiving_Node::get_status( d );
+  Spiking_Node::get_status( d );
 
   ( *d )[ names::recordables ] = recordablesMap_.get_list();
 
@@ -567,7 +567,7 @@ iaf_cond_alpha_mc::set_status( const DictionaryDatum& d )
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Spiking_Node::set_status( d );
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;

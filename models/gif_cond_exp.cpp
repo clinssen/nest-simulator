@@ -363,7 +363,7 @@ nest::gif_cond_exp::Buffers_::Buffers_( const Buffers_&, gif_cond_exp& n )
  * ---------------------------------------------------------------- */
 
 nest::gif_cond_exp::gif_cond_exp()
-  : Archiving_Node()
+  : Spiking_Node()
   , P_()
   , S_( P_ )
   , B_( *this )
@@ -372,7 +372,7 @@ nest::gif_cond_exp::gif_cond_exp()
 }
 
 nest::gif_cond_exp::gif_cond_exp( const gif_cond_exp& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , P_( n.P_ )
   , S_( n.S_ )
   , B_( n.B_, *this )
@@ -414,7 +414,7 @@ nest::gif_cond_exp::init_buffers_()
   B_.spike_inh_.clear(); // includes resize
   B_.currents_.clear();  //!< includes resize
   B_.logger_.reset();    //!< includes resize
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 
   B_.step_ = Time::get_resolution().get_ms();
   B_.IntegrationStep_ = B_.step_;

@@ -111,7 +111,7 @@ SeeAlso: iaf_cond_alpha, aeif_cond_exp, aeif_cond_alpha
 namespace nest
 {
 
-class aeif_cond_alpha_RK5 : public Archiving_Node
+class aeif_cond_alpha_RK5 : public Spiking_Node
 {
 
 public:
@@ -371,7 +371,7 @@ aeif_cond_alpha_RK5::get_status( DictionaryDatum& d ) const
 {
   P_.get( d );
   S_.get( d );
-  Archiving_Node::get_status( d );
+  Spiking_Node::get_status( d );
 
   ( *d )[ names::recordables ] = recordablesMap_.get_list();
 }
@@ -388,7 +388,7 @@ aeif_cond_alpha_RK5::set_status( const DictionaryDatum& d )
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Spiking_Node::set_status( d );
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;

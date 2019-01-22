@@ -49,7 +49,7 @@ namespace nest
 {
 class Model;
 class Subnet;
-class Archiving_Node;
+class Spiking_Node;
 
 
 /**

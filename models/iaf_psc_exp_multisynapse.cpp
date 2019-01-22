@@ -253,7 +253,7 @@ iaf_psc_exp_multisynapse::Buffers_::Buffers_( const Buffers_&,
  * ---------------------------------------------------------------- */
 
 iaf_psc_exp_multisynapse::iaf_psc_exp_multisynapse()
-  : Archiving_Node()
+  : Spiking_Node()
   , P_()
   , S_()
   , B_( *this )
@@ -263,7 +263,7 @@ iaf_psc_exp_multisynapse::iaf_psc_exp_multisynapse()
 
 iaf_psc_exp_multisynapse::iaf_psc_exp_multisynapse(
   const iaf_psc_exp_multisynapse& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , P_( n.P_ )
   , S_( n.S_ )
   , B_( n.B_, *this )
@@ -291,7 +291,7 @@ iaf_psc_exp_multisynapse::init_buffers_()
 
   B_.logger_.reset();
 
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 }
 
 void
@@ -434,7 +434,7 @@ iaf_psc_exp_multisynapse::set_status( const DictionaryDatum& d )
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Spiking_Node::set_status( d );
 
   /*
    * Here is where we must update the recordablesMap_ if new receptors

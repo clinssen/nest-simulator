@@ -43,7 +43,7 @@ namespace nest
 {
 
 parrot_neuron_ps::parrot_neuron_ps()
-  : Archiving_Node()
+  : Spiking_Node()
 {
 }
 
@@ -52,7 +52,7 @@ parrot_neuron_ps::init_buffers_()
 {
   B_.events_.resize();
   B_.events_.clear();
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 }
 
 void
@@ -101,13 +101,13 @@ parrot_neuron_ps::update( Time const& origin, long const from, long const to )
 void
 parrot_neuron_ps::get_status( DictionaryDatum& d ) const
 {
-  Archiving_Node::get_status( d );
+  Spiking_Node::get_status( d );
 }
 
 void
 parrot_neuron_ps::set_status( const DictionaryDatum& d )
 {
-  Archiving_Node::set_status( d );
+  Spiking_Node::set_status( d );
 }
 
 // function handles exact spike times

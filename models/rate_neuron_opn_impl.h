@@ -157,7 +157,7 @@ nest::rate_neuron_opn< TNonlinearities >::Buffers_::Buffers_( const Buffers_&,
 
 template < class TNonlinearities >
 nest::rate_neuron_opn< TNonlinearities >::rate_neuron_opn()
-  : Archiving_Node()
+  : Spiking_Node()
   , P_()
   , S_()
   , B_( *this )
@@ -169,7 +169,7 @@ nest::rate_neuron_opn< TNonlinearities >::rate_neuron_opn()
 template < class TNonlinearities >
 nest::rate_neuron_opn< TNonlinearities >::rate_neuron_opn(
   const rate_neuron_opn& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , P_( n.P_ )
   , S_( n.S_ )
   , B_( n.B_, *this )
@@ -211,7 +211,7 @@ nest::rate_neuron_opn< TNonlinearities >::init_buffers_()
   }
 
   B_.logger_.reset(); // includes resize
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 }
 
 template < class TNonlinearities >

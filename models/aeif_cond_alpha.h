@@ -143,7 +143,7 @@ aeif_cond_alpha_dynamics( double, const double*, double*, void* );
 extern "C" int
 aeif_cond_alpha_dynamics_DT0( double, const double*, double*, void* );
 
-class aeif_cond_alpha : public Archiving_Node
+class aeif_cond_alpha : public Spiking_Node
 {
 
 public:
@@ -393,7 +393,7 @@ aeif_cond_alpha::get_status( DictionaryDatum& d ) const
 {
   P_.get( d );
   S_.get( d );
-  Archiving_Node::get_status( d );
+  Spiking_Node::get_status( d );
 
   ( *d )[ names::recordables ] = recordablesMap_.get_list();
 }
@@ -410,7 +410,7 @@ aeif_cond_alpha::set_status( const DictionaryDatum& d )
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Spiking_Node::set_status( d );
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;

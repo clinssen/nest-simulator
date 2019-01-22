@@ -73,7 +73,7 @@ Author: adapted from parrot_neuron by Kunkel
 
 namespace nest
 {
-class parrot_neuron_ps : public Archiving_Node
+class parrot_neuron_ps : public Spiking_Node
 {
 public:
   parrot_neuron_ps();

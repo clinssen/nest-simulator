@@ -626,7 +626,7 @@ nest::ht_neuron::Buffers_::Buffers_( const Buffers_&, ht_neuron& n )
  * ---------------------------------------------------------------- */
 
 nest::ht_neuron::ht_neuron()
-  : Archiving_Node()
+  : Spiking_Node()
   , P_()
   , S_( *this, P_ )
   , B_( *this )
@@ -635,7 +635,7 @@ nest::ht_neuron::ht_neuron()
 }
 
 nest::ht_neuron::ht_neuron( const ht_neuron& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , P_( n.P_ )
   , S_( n.S_ )
   , B_( n.B_, *this )
@@ -685,7 +685,7 @@ nest::ht_neuron::init_buffers_()
 
   B_.logger_.reset();
 
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 
   B_.step_ = Time::get_resolution().get_ms();
   B_.integration_step_ = B_.step_;
@@ -794,7 +794,7 @@ nest::ht_neuron::get_status( DictionaryDatum& d ) const
 {
   P_.get( d );
   S_.get( d );
-  Archiving_Node::get_status( d );
+  Spiking_Node::get_status( d );
 
   DictionaryDatum receptor_type = new Dictionary();
 
@@ -819,7 +819,7 @@ nest::ht_neuron::set_status( const DictionaryDatum& d )
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Spiking_Node::set_status( d );
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;

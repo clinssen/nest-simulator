@@ -1,5 +1,5 @@
 /*
- *  archiving_node.h
+ *  node_tracer.h
  *
  *  This file is part of NEST.
  *
@@ -20,16 +20,9 @@
  *
  */
 
-/**
- * \file archiving_node.h
- * Definition of Archiving_Node which is capable of
- * recording and managing a spike history.
- * \author Moritz Helias, Abigail Morrison
- * \date april 2006
- */
 
-#ifndef ARCHIVING_NODE_H
-#define ARCHIVING_NODE_H
+#ifndef NODE_TRACER_H
+#define NODE_TRACER_H
 
 // C++ includes:
 #include <deque>
@@ -49,78 +42,32 @@
 namespace nest
 {
 
-/**
- * \class Archiving_Node
- * a node which archives spike history for the purposes of
- * timing dependent plasticity
- */
-class Archiving_Node : public Node
+class Node_Spike_Archiver : public Node_Tracer
 {
-  using Node::get_synaptic_elements;
-  friend class NodeTracer;
-  
-  
+
 public:
   /**
-   * \fn Archiving_Node()
+   * \fn Node_Spike_Archiver()
    * Constructor.
    */
-  Archiving_Node();
+  Node_Spike_Archiver();
 
   /**
-   * \fn Archiving_Node()
+   * \fn Node_Spike_Archiver()
    * Copy Constructor.
    */
-  Archiving_Node( const Archiving_Node& );
+  Node_Spike_Archiver( const Node_Spike_Archiver& );
+
+    void
+    notifySpikeOccurred( Time const& t_sp, double offset );
+
+
 
   /**
-   * \fn double get_synaptic_elements(Name n)
-   * get the number of synaptic element for the current Node
-   * the number of synaptic elements is a double value but the number of
-   * actual vacant and connected elements is an integer truncated from this
-   * value
+   * \fn double get_Ca_minus()
+   * return the current value of Ca_minus
    */
-  double get_synaptic_elements( Name n ) const;
-
-  /**
-   * \fn int get_synaptic_elements_vacant(Name n)
-   * get the number of synaptic elements of type n which are available
-   * for new synapse creation
-   */
-  int get_synaptic_elements_vacant( Name n ) const;
-
-  /**
-   * \fn int get_synaptic_elements_connected(Name n)
-   * get the number of synaptic element of type n which are currently
-   * connected
-   */
-  int get_synaptic_elements_connected( Name n ) const;
-
-  /**
-   * \fn std::map<Name, double> get_synaptic_elements()
-   * get the number of all synaptic elements for the current Node
-   */
-  std::map< Name, double > get_synaptic_elements() const;
-
-  /**
-   * \fn void update_synaptic_elements()
-   * Change the number of synaptic elements in the node depending on the
-   * dynamics described by the corresponding growth curve
-   */
-  void update_synaptic_elements( double t );
-
-  /**
-   * \fn void decay_synaptic_elements_vacant()
-   * Delete a certain portion of the vacant synaptic elements which are not
-   * in use
-   */
-  void decay_synaptic_elements_vacant();
-
-  /**
-   * \fn void connect_synaptic_element()
-   * Change the number of connected synaptic elements by n
-   */
-  void connect_synaptic_element( Name name, int n );
+  double get_Ca_minus() const;
 
   /**
    * \fn double get_K_value(long t)
@@ -155,14 +102,6 @@ public:
     std::deque< histentry >::iterator* start,
     std::deque< histentry >::iterator* finish );
 
-  /**
-   * Register a new incoming STDP connection.
-   *
-   * t_first_read: The newly registered synapse will read the history entries
-   * with t > t_first_read.
-   */
-  void register_stdp_connection( double t_first_read );
-
   void get_status( DictionaryDatum& d ) const;
   void set_status( const DictionaryDatum& d );
 
@@ -172,9 +111,6 @@ public:
    */
   double get_tau_Ca() const;
 
-  void register_tracer( Node_Tracer const * nodeTracer );
-  
-  
 protected:
   /**
    * \fn void set_spiketime(Time const & t_sp, double offset)
@@ -240,26 +176,22 @@ private:
 
   // Map of the synaptic elements
   std::map< Name, SynapticElement > synaptic_elements_map_;
-  
-  
-  std::vector< Node_Tracer* > _tracers;
-
 };
 
 inline double
-Archiving_Node::get_spiketime_ms() const
+Node_Spike_Archiver::get_spiketime_ms() const
 {
   return last_spike_;
 }
 
 inline double
-Archiving_Node::get_tau_Ca() const
+Node_Spike_Archiver::get_tau_Ca() const
 {
   return tau_Ca_;
 }
 
 inline double
-Archiving_Node::get_Ca_minus() const
+Node_Spike_Archiver::get_Ca_minus() const
 {
   return Ca_minus_;
 }

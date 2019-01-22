@@ -288,7 +288,7 @@ nest::aeif_cond_alpha_RK5::Buffers_::Buffers_( const Buffers_&,
  * ---------------------------------------------------------------- */
 
 nest::aeif_cond_alpha_RK5::aeif_cond_alpha_RK5()
-  : Archiving_Node()
+  : Spiking_Node()
   , P_()
   , S_( P_ )
   , B_( *this )
@@ -297,7 +297,7 @@ nest::aeif_cond_alpha_RK5::aeif_cond_alpha_RK5()
 }
 
 nest::aeif_cond_alpha_RK5::aeif_cond_alpha_RK5( const aeif_cond_alpha_RK5& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , P_( n.P_ )
   , S_( n.S_ )
   , B_( n.B_, *this )
@@ -325,7 +325,7 @@ nest::aeif_cond_alpha_RK5::init_buffers_()
   B_.spike_exc_.clear(); // includes resize
   B_.spike_inh_.clear(); // includes resize
   B_.currents_.clear();  // includes resize
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 
   B_.logger_.reset();
 

@@ -237,7 +237,7 @@ STDPConnection< targetidentifierT >::send( Event& e,
   // which increases the access counter for these entries.
   // At registration, all entries' access counters of
   // history[0, ..., t_last_spike - dendritic_delay] have been
-  // incremented by Archiving_Node::register_stdp_connection(). See bug #218 for
+  // incremented by Spiking_Node::register_stdp_connection(). See bug #218 for
   // details.
   target->get_history( t_lastspike_ - dendritic_delay,
     t_spike - dendritic_delay,

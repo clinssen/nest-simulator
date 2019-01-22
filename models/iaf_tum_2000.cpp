@@ -202,7 +202,7 @@ nest::iaf_tum_2000::Buffers_::Buffers_( const Buffers_&, iaf_tum_2000& n )
  * ---------------------------------------------------------------- */
 
 nest::iaf_tum_2000::iaf_tum_2000()
-  : Archiving_Node()
+  : Spiking_Node()
   , P_()
   , S_()
   , B_( *this )
@@ -211,7 +211,7 @@ nest::iaf_tum_2000::iaf_tum_2000()
 }
 
 nest::iaf_tum_2000::iaf_tum_2000( const iaf_tum_2000& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , P_( n.P_ )
   , S_( n.S_ )
   , B_( n.B_, *this )
@@ -236,7 +236,7 @@ nest::iaf_tum_2000::init_buffers_()
   B_.spikes_in_.clear(); // includes resize
   B_.currents_.clear();  // includes resize
   B_.logger_.reset();    // includes resize
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 }
 
 void

@@ -308,7 +308,7 @@ nest::aeif_psc_delta::Buffers_::Buffers_( const Buffers_&, aeif_psc_delta& n )
  * ---------------------------------------------------------------- */
 
 nest::aeif_psc_delta::aeif_psc_delta()
-  : Archiving_Node()
+  : Spiking_Node()
   , P_()
   , S_( P_ )
   , B_( *this )
@@ -317,7 +317,7 @@ nest::aeif_psc_delta::aeif_psc_delta()
 }
 
 nest::aeif_psc_delta::aeif_psc_delta( const aeif_psc_delta& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , P_( n.P_ )
   , S_( n.S_ )
   , B_( n.B_, *this )
@@ -357,7 +357,7 @@ nest::aeif_psc_delta::init_buffers_()
 {
   B_.spikes_.clear();   // includes resize
   B_.currents_.clear(); // includes resize
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 
   B_.logger_.reset();
 

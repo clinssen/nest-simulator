@@ -137,7 +137,7 @@ namespace nest
  * from this one.
  * @todo Implement current input in consistent way.
  */
-class iaf_psc_alpha_canon : public Archiving_Node
+class iaf_psc_alpha_canon : public Spiking_Node
 {
 public:
   /** Basic constructor.
@@ -496,7 +496,7 @@ iaf_psc_alpha_canon::get_status( DictionaryDatum& d ) const
 {
   P_.get( d );
   S_.get( d, P_ );
-  Archiving_Node::get_status( d );
+  Spiking_Node::get_status( d );
 
   ( *d )[ names::recordables ] = recordablesMap_.get_list();
 }
@@ -513,7 +513,7 @@ iaf_psc_alpha_canon::set_status( const DictionaryDatum& d )
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Spiking_Node::set_status( d );
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;

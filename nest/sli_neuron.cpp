@@ -79,7 +79,7 @@ nest::sli_neuron::Buffers_::Buffers_( const Buffers_&, sli_neuron& n )
  * ---------------------------------------------------------------- */
 
 nest::sli_neuron::sli_neuron()
-  : Archiving_Node()
+  : Spiking_Node()
   , state_( new Dictionary() )
   , B_( *this )
 {
@@ -91,7 +91,7 @@ nest::sli_neuron::sli_neuron()
 }
 
 nest::sli_neuron::sli_neuron( const sli_neuron& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , state_( new Dictionary( *n.state_ ) )
   , B_( n.B_, *this )
 {
@@ -116,7 +116,7 @@ nest::sli_neuron::init_buffers_()
   B_.in_spikes_.clear(); // includes resize
   B_.currents_.clear();  // includes resize
   B_.logger_.reset();    // includes resize
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 }
 
 

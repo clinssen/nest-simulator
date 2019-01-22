@@ -245,7 +245,7 @@ nest::gif_psc_exp::Buffers_::Buffers_( const Buffers_&, gif_psc_exp& n )
  * ---------------------------------------------------------------- */
 
 nest::gif_psc_exp::gif_psc_exp()
-  : Archiving_Node()
+  : Spiking_Node()
   , P_()
   , S_()
   , B_( *this )
@@ -254,7 +254,7 @@ nest::gif_psc_exp::gif_psc_exp()
 }
 
 nest::gif_psc_exp::gif_psc_exp( const gif_psc_exp& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , P_( n.P_ )
   , S_( n.S_ )
   , B_( n.B_, *this )
@@ -280,7 +280,7 @@ nest::gif_psc_exp::init_buffers_()
   B_.spikes_in_.clear(); // includes resize
   B_.currents_.clear();  //!< includes resize
   B_.logger_.reset();    //!< includes resize
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 }
 
 void

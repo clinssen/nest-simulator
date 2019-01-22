@@ -242,7 +242,7 @@ nest::iaf_psc_exp_ps_lossless::State_::set( const DictionaryDatum& d,
  * ---------------------------------------------------------------- */
 
 nest::iaf_psc_exp_ps_lossless::iaf_psc_exp_ps_lossless()
-  : Archiving_Node()
+  : Spiking_Node()
   , P_()
   , S_()
   , B_( *this )
@@ -252,7 +252,7 @@ nest::iaf_psc_exp_ps_lossless::iaf_psc_exp_ps_lossless()
 
 nest::iaf_psc_exp_ps_lossless::iaf_psc_exp_ps_lossless(
   const iaf_psc_exp_ps_lossless& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , P_( n.P_ )
   , S_( n.S_ )
   , B_( n.B_, *this )

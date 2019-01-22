@@ -173,7 +173,7 @@ aeif_cond_alpha_multisynapse_dynamics( double, const double*, double*, void* );
  * Brette and Gerstner
  * (2005) with multiple ports.
  */
-class aeif_cond_alpha_multisynapse : public Archiving_Node
+class aeif_cond_alpha_multisynapse : public Spiking_Node
 {
 
 public:
@@ -438,7 +438,7 @@ aeif_cond_alpha_multisynapse::get_status( DictionaryDatum& d ) const
 {
   P_.get( d );
   S_.get( d );
-  Archiving_Node::get_status( d );
+  Spiking_Node::get_status( d );
 
   ( *d )[ names::recordables ] = recordablesMap_.get_list();
 }

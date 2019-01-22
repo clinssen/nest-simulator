@@ -132,7 +132,7 @@ namespace nest
  */
 extern "C" int ht_neuron_dynamics( double, const double*, double*, void* );
 
-class ht_neuron : public Archiving_Node
+class ht_neuron : public Spiking_Node
 {
 public:
   ht_neuron();

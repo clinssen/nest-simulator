@@ -80,7 +80,7 @@ FirstVersion: May 2006
 
 namespace nest
 {
-class parrot_neuron : public Archiving_Node
+class parrot_neuron : public Spiking_Node
 {
 
 public:

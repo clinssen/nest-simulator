@@ -67,13 +67,13 @@ void ::nest::volume_transmitter::Parameters_::set( const DictionaryDatum& d )
  * ---------------------------------------------------------------- */
 
 nest::volume_transmitter::volume_transmitter()
-  : Archiving_Node()
+  : Spiking_Node()
   , P_()
 {
 }
 
 nest::volume_transmitter::volume_transmitter( const volume_transmitter& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , P_( n.P_ )
 {
 }
@@ -90,7 +90,7 @@ nest::volume_transmitter::init_buffers_()
   B_.spikecounter_.clear();
   B_.spikecounter_.push_back(
     spikecounter( 0.0, 0.0 ) ); // insert pseudo last dopa spike at t = 0.0
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 }
 
 void

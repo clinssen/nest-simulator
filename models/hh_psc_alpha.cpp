@@ -299,7 +299,7 @@ nest::hh_psc_alpha::Buffers_::Buffers_( const Buffers_&, hh_psc_alpha& n )
  * ---------------------------------------------------------------- */
 
 nest::hh_psc_alpha::hh_psc_alpha()
-  : Archiving_Node()
+  : Spiking_Node()
   , P_()
   , S_( P_ )
   , B_( *this )
@@ -308,7 +308,7 @@ nest::hh_psc_alpha::hh_psc_alpha()
 }
 
 nest::hh_psc_alpha::hh_psc_alpha( const hh_psc_alpha& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , P_( n.P_ )
   , S_( n.S_ )
   , B_( n.B_, *this )
@@ -349,7 +349,7 @@ nest::hh_psc_alpha::init_buffers_()
   B_.spike_exc_.clear(); // includes resize
   B_.spike_inh_.clear(); // includes resize
   B_.currents_.clear();  // includes resize
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 
   B_.logger_.reset();
 

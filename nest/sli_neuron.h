@@ -93,7 +93,7 @@ SeeAlso: iaf_psc_delta, iaf_psc_exp, iaf_cond_exp, testsuite::test_sli_neuron
 /**
  *  neuron with state and dynamics defined as SLI code
  */
-class sli_neuron : public Archiving_Node
+class sli_neuron : public Spiking_Node
 {
 
 public:
@@ -263,19 +263,19 @@ sli_neuron::get_status( DictionaryDatum& d ) const
   // We needn't do anything else here, since d already points to
   // sli_neuron::state_, because of Node::get_status_dict_().
   //
-  Archiving_Node::get_status( d );
+  Spiking_Node::get_status( d );
   ( *d )[ names::recordables ] = recordablesMap_.get_list();
 }
 
 inline void
 sli_neuron::set_status( const DictionaryDatum& d )
 {
-  Archiving_Node::set_status( d );
+  Spiking_Node::set_status( d );
 
   // To initialize the state dictionary, we copy all entries from d into s.
   // Later, the state dictionary will be in the interpreter and values are
   // changed automatically. SetStatus is then only needed to change properties
-  // of Archiving_Node.
+  // of Spiking_Node.
   for ( TokenMap::const_iterator it = d->begin(); it != d->end(); ++it )
   {
     state_->insert( it->first, it->second );

@@ -100,7 +100,7 @@ namespace nest
  * Leaky iaf neuron, exponential PSC synapses, lossless implementation.
  * @todo Implement current input in consistent way.
  */
-class iaf_psc_exp_ps_lossless : public Archiving_Node
+class iaf_psc_exp_ps_lossless : public Spiking_Node
 {
 public:
   /** Basic constructor.

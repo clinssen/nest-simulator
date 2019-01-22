@@ -229,7 +229,7 @@ nest::iaf_psc_alpha_presc::Buffers_::Buffers_( const Buffers_&,
  * ---------------------------------------------------------------- */
 
 nest::iaf_psc_alpha_presc::iaf_psc_alpha_presc()
-  : Archiving_Node()
+  : Spiking_Node()
   , P_()
   , S_()
   , B_( *this )
@@ -238,7 +238,7 @@ nest::iaf_psc_alpha_presc::iaf_psc_alpha_presc()
 }
 
 nest::iaf_psc_alpha_presc::iaf_psc_alpha_presc( const iaf_psc_alpha_presc& n )
-  : Archiving_Node( n )
+  : Spiking_Node( n )
   , P_( n.P_ )
   , S_( n.S_ )
   , B_( n.B_, *this )
@@ -266,7 +266,7 @@ nest::iaf_psc_alpha_presc::init_buffers_()
 
   B_.logger_.reset();
 
-  Archiving_Node::clear_history();
+  Spiking_Node::clear_history();
 }
 
 void

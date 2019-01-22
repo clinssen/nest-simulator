@@ -59,7 +59,7 @@ Author:  Plesser, adapted from iaf_psc_alpha_multisynapse
 SeeAlso: iaf_psc_alpha, iaf_psc_delta, iaf_psc_exp, iaf_cond_exp,
 iaf_psc_alpha_multisynapse
 */
-class iaf_psc_exp_multisynapse : public Archiving_Node
+class iaf_psc_exp_multisynapse : public Spiking_Node
 {
 
 public:
@@ -329,7 +329,7 @@ iaf_psc_exp_multisynapse::get_status( DictionaryDatum& d ) const
 {
   P_.get( d );
   S_.get( d, P_ );
-  Archiving_Node::get_status( d );
+  Spiking_Node::get_status( d );
 
   ( *d )[ names::recordables ] = recordablesMap_.get_list();
 }

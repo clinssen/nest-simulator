@@ -177,7 +177,7 @@ namespace nest
 /**
  * Point process neuron with leaky integration of delta-shaped PSCs.
  */
-class pp_psc_delta : public Archiving_Node
+class pp_psc_delta : public Spiking_Node
 {
 
 public:
@@ -423,7 +423,7 @@ pp_psc_delta::get_status( DictionaryDatum& d ) const
 {
   P_.get( d );
   S_.get( d, P_ );
-  Archiving_Node::get_status( d );
+  Spiking_Node::get_status( d );
   ( *d )[ names::recordables ] = recordablesMap_.get_list();
 }
 
@@ -439,7 +439,7 @@ pp_psc_delta::set_status( const DictionaryDatum& d )
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Spiking_Node::set_status( d );
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
