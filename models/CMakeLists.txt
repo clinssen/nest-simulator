@@ -106,6 +106,7 @@ set( models_sources
     stdp_dopa_connection.h stdp_dopa_connection.cpp
     stdp_connection_facetshw_hom.h stdp_connection_facetshw_hom_impl.h
     stdp_pl_connection_hom.h stdp_pl_connection_hom.cpp
+    stdp_pl_connection.h stdp_pl_connection.cpp
     stdp_triplet_connection.h
     step_current_generator.h step_current_generator.cpp
     tanh_rate.h tanh_rate.cpp

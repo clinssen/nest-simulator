@@ -138,6 +138,7 @@
 #include "stdp_triplet_connection.h"
 #include "stdp_dopa_connection.h"
 #include "stdp_pl_connection_hom.h"
+#include "stdp_pl_connection.h"
 #include "tsodyks2_connection.h"
 #include "tsodyks_connection.h"
 #include "tsodyks_connection_hom.h"
@@ -535,6 +536,16 @@ ModelsModule::init( SLIInterpreter* )
     .model_manager
     .register_connection_model< STDPPLConnectionHom< TargetIdentifierIndex > >(
       "stdp_pl_synapse_hom_hpc" );
+
+
+  kernel()
+    .model_manager
+    .register_connection_model< STDPPLConnection< TargetIdentifierPtrRport > >(
+      "stdp_pl_synapse" );
+  kernel()
+    .model_manager
+    .register_connection_model< STDPPLConnection< TargetIdentifierIndex > >(
+      "stdp_pl_synapse_hpc" );
 
 
   /** @BeginDocumentation

@@ -98,20 +98,36 @@ Archiving_Node::register_stdp_connection( double t_first_read )
 double
 nest::Archiving_Node::get_K_value( double t )
 {
+#ifdef CAP_PRINTS
+  std::cerr << "In Archiving_Node::get_K_value(t = " << t << ")\n";
+#endif
   if ( history_.empty() )
   {
+#ifdef CAP_PRINTS
+std::cerr <<"\tHistory empty, returning 0\n";
+#endif
     return Kminus_;
   }
   int i = history_.size() - 1;
   while ( i >= 0 )
   {
+#ifdef CAP_PRINTS
+	std::cerr << "\tTesting " << t << " against " << history_[i].t_ << "...\t";
+#endif
     if ( t - history_[ i ].t_ > kernel().connection_manager.get_stdp_eps() )
     {
+#ifdef CAP_PRINTS
+std::cerr << "\t--> MATCH, returning Kminus_ = " <<  ( history_[ i ].Kminus_
+        * std::exp( ( history_[ i ].t_ - t ) * tau_minus_inv_ ) ) << "\n";
+#endif
       return ( history_[ i ].Kminus_
         * std::exp( ( history_[ i ].t_ - t ) * tau_minus_inv_ ) );
     }
     i--;
   }
+#ifdef CAP_PRINTS
+std::cerr << "\tXXX: fall-through: returning 0 \n";
+#endif
   return 0;
 }
 

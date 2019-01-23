@@ -203,6 +203,12 @@ private:
   double Wmax_;
   double Kplus_;
 
+
+
+  double tau_minus_;
+  double tau_minus_inv_;
+    
+
   double t_lastspike_;
 };
 
@@ -219,6 +225,8 @@ STDPConnection< targetidentifierT >::send( Event& e,
   thread t,
   const CommonSynapseProperties& )
 {
+  double _Kminus = 0.;
+
   // synapse STDP depressing/facilitation dynamics
   double t_spike = e.get_stamp().get_ms();
 
@@ -239,25 +247,62 @@ STDPConnection< targetidentifierT >::send( Event& e,
   // history[0, ..., t_last_spike - dendritic_delay] have been
   // incremented by Archiving_Node::register_stdp_connection(). See bug #218 for
   // details.
-  target->get_history( t_lastspike_ - dendritic_delay,
-    t_spike - dendritic_delay,
+  
+  const double t_interval_start = t_lastspike_ - dendritic_delay;
+  const double t_interval_end = t_spike - dendritic_delay;
+  
+  target->get_history( -999999.,
+    999999.,
     &start,
     &finish );
   // facilitation due to post-synaptic spikes since last pre-synaptic spike
   double minus_dt;
+#ifdef CAP_PRINTS
+  std::cerr << "Finding local Kminus...\n";
+#endif
   while ( start != finish )
   {
-    minus_dt = t_lastspike_ - ( start->t_ + dendritic_delay );
-    ++start;
+    if (start->t_ > t_interval_start + kernel().connection_manager.get_stdp_eps() && start->t_ <= t_interval_end) {
+	    minus_dt = t_lastspike_ - ( start->t_ + dendritic_delay );
     // get_history() should make sure that
     // start->t_ > t_lastspike - dendritic_delay, i.e. minus_dt < 0
-    assert( minus_dt < -1.0 * kernel().connection_manager.get_stdp_eps() );
-    weight_ = facilitate_( weight_, Kplus_ * std::exp( minus_dt / tau_plus_ ) );
+	    assert( minus_dt < -1.0 * kernel().connection_manager.get_stdp_eps() );
+	    weight_ = facilitate_( weight_, Kplus_ * std::exp( minus_dt / tau_plus_ ) );
+   }
+
+#ifdef CAP_PRINTS
+   std::cerr << "\tTesting " << (t_spike - dendritic_delay) << " against " << start->t_ << "...\n";
+#endif
+   if ( t_spike - dendritic_delay - start->t_ > kernel().connection_manager.get_stdp_eps() ) {
+    	_Kminus = ( start->Kminus_
+    	        * std::exp( ( start->t_ - ( t_spike - dendritic_delay ) ) * tau_minus_inv_ ) );
+#ifdef CAP_PRINTS
+	   std::cerr << "\t\tCondition met, new _Kminus = " << _Kminus << std::endl;
+#endif
+    }
+
+    ++start;
   }
 
-  // depression due to new pre-synaptic spike
+  /*int i = history_.size() - 1;
+  while ( i >= 0 )
+  {
+    if ( t_spike - dendritic_delay - history_[ i ].t_ > kernel().connection_manager.get_stdp_eps() )
+    {
+      return ( history_[ i ].Kminus_
+        * std::exp( ( history_[ i ].t_ - ( t_spike - dendritic_delay ) ) * tau_minus_inv_ ) );
+    }
+    i--;
+  }*/
+
+#ifdef CAP_PRINTS
+  //std::cerr << "local _Kminus = " << _Kminus << ", target->Kminus = " << target->get_K_value( t_spike - dendritic_delay ) << std::endl;
+#endif
+  //assert( _Kminus == target->get_K_value( t_spike - dendritic_delay ));
+
   weight_ =
-    depress_( weight_, target->get_K_value( t_spike - dendritic_delay ) );
+    depress_( weight_, _Kminus );
+    //depress_( weight_, target->get_K_value( t_spike - dendritic_delay ) );
 
   e.set_receiver( *target );
   e.set_weight( weight_ );
@@ -278,7 +323,10 @@ STDPConnection< targetidentifierT >::STDPConnection()
   : ConnectionBase()
   , weight_( 1.0 )
   , tau_plus_( 20.0 )
-  , lambda_( 0.01 )
+  , tau_minus_( 20.0 )
+    , tau_minus_inv_( 1. / tau_minus_ )
+    
+      , lambda_( 0.01 )
   , alpha_( 1.0 )
   , mu_plus_( 1.0 )
   , mu_minus_( 1.0 )
@@ -294,7 +342,9 @@ STDPConnection< targetidentifierT >::STDPConnection(
   : ConnectionBase( rhs )
   , weight_( rhs.weight_ )
   , tau_plus_( rhs.tau_plus_ )
-  , lambda_( rhs.lambda_ )
+  , tau_minus_( rhs.tau_minus_ )
+    , tau_minus_inv_( rhs.tau_minus_inv_ )
+      , lambda_( rhs.lambda_ )
   , alpha_( rhs.alpha_ )
   , mu_plus_( rhs.mu_plus_ )
   , mu_minus_( rhs.mu_minus_ )
@@ -311,6 +361,7 @@ STDPConnection< targetidentifierT >::get_status( DictionaryDatum& d ) const
   ConnectionBase::get_status( d );
   def< double >( d, names::weight, weight_ );
   def< double >( d, names::tau_plus, tau_plus_ );
+  def< double >( d, names::tau_minus, tau_minus_ );
   def< double >( d, names::lambda, lambda_ );
   def< double >( d, names::alpha, alpha_ );
   def< double >( d, names::mu_plus, mu_plus_ );
@@ -326,7 +377,12 @@ STDPConnection< targetidentifierT >::set_status( const DictionaryDatum& d,
 {
   ConnectionBase::set_status( d, cm );
   updateValue< double >( d, names::weight, weight_ );
+
   updateValue< double >( d, names::tau_plus, tau_plus_ );
+
+  updateValue< double >( d, names::tau_minus, tau_minus_ );
+  tau_minus_inv_ = 1. / tau_minus_;
+
   updateValue< double >( d, names::lambda, lambda_ );
   updateValue< double >( d, names::alpha, alpha_ );
   updateValue< double >( d, names::mu_plus, mu_plus_ );
