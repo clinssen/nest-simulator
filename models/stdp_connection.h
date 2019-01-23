@@ -250,9 +250,9 @@ STDPConnection< targetidentifierT >::send( Event& e,
   
   const double t_interval_start = t_lastspike_ - dendritic_delay;
   const double t_interval_end = t_spike - dendritic_delay;
-  
-  target->get_history( -999999.,
-    999999.,
+
+  target->get_history( t_interval_start,
+    t_interval_end,
     &start,
     &finish );
   // facilitation due to post-synaptic spikes since last pre-synaptic spike
@@ -262,24 +262,24 @@ STDPConnection< targetidentifierT >::send( Event& e,
 #endif
   while ( start != finish )
   {
-    if (start->t_ > t_interval_start + kernel().connection_manager.get_stdp_eps() && start->t_ <= t_interval_end) {
+   // if (start->t_ > t_interval_start + kernel().connection_manager.get_stdp_eps() && start->t_ <= t_interval_end) {
 	    minus_dt = t_lastspike_ - ( start->t_ + dendritic_delay );
     // get_history() should make sure that
     // start->t_ > t_lastspike - dendritic_delay, i.e. minus_dt < 0
 	    assert( minus_dt < -1.0 * kernel().connection_manager.get_stdp_eps() );
 	    weight_ = facilitate_( weight_, Kplus_ * std::exp( minus_dt / tau_plus_ ) );
-   }
+   //}
 
 #ifdef CAP_PRINTS
    std::cerr << "\tTesting " << (t_spike - dendritic_delay) << " against " << start->t_ << "...\n";
 #endif
-   if ( t_spike - dendritic_delay - start->t_ > kernel().connection_manager.get_stdp_eps() ) {
+/*   if ( t_spike - dendritic_delay - start->t_ > kernel().connection_manager.get_stdp_eps() ) {
     	_Kminus = ( start->Kminus_
     	        * std::exp( ( start->t_ - ( t_spike - dendritic_delay ) ) * tau_minus_inv_ ) );
 #ifdef CAP_PRINTS
 	   std::cerr << "\t\tCondition met, new _Kminus = " << _Kminus << std::endl;
 #endif
-    }
+    }*/
 
     ++start;
   }
@@ -301,8 +301,8 @@ STDPConnection< targetidentifierT >::send( Event& e,
   //assert( _Kminus == target->get_K_value( t_spike - dendritic_delay ));
 
   weight_ =
-    depress_( weight_, _Kminus );
-    //depress_( weight_, target->get_K_value( t_spike - dendritic_delay ) );
+    //depress_( weight_, _Kminus );
+    depress_( weight_, target->get_K_value( t_spike - dendritic_delay ) );
 
   e.set_receiver( *target );
   e.set_weight( weight_ );

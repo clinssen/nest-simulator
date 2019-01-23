@@ -282,8 +282,8 @@ def build_network(logger):
                    {'weight': brunel_params['g'] * JE_pA})
 
     stdp_params['weight'] = JE_pA
-    nest.SetDefaults('stdp_pl_synapse_hom_hpc', stdp_params)
-    #nest.SetDefaults('stdp_pl_synapse_hpc', stdp_params)
+    #nest.SetDefaults('stdp_pl_synapse_hom_hpc', stdp_params)
+    nest.SetDefaults('stdp_pl_synapse_hpc', stdp_params)
 
     nest.message(M_INFO, 'build_network', 'Connecting stimulus generators.')
 
@@ -300,8 +300,8 @@ def build_network(logger):
     nest.Connect(E_neurons, E_neurons,
                  {'rule': 'fixed_indegree', 'indegree': CE,
                      'autapses': False, 'multapses': True},
-                 {'model': 'stdp_pl_synapse_hom_hpc'})
- #                {'model': 'stdp_pl_synapse_hpc'})
+ #                {'model': 'stdp_pl_synapse_hom_hpc'})
+                 {'model': 'stdp_pl_synapse_hpc'})
 
     nest.message(M_INFO, 'build_network',
                  'Connecting inhibitory -> excitatory population.')
