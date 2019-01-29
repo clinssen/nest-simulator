@@ -1,4 +1,6 @@
-# lib/CMakeLists.txt
+# -*- coding: utf-8 -*-
+#
+# setup.py
 #
 # This file is part of NEST.
 #
@@ -16,6 +18,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
-install( DIRECTORY sli
-    DESTINATION ${CMAKE_INSTALL_DATADIR}
-    )
+
+from distutils.core import setup
+
+setup(name         = 'Topology',
+      version      = '2.14.0',
+      description  = 'Python bindings for NEST Topology module',
+      author       = 'The NEST Initiative',
+      url          = 'http://www.nest-simulator.org',
+      packages     = ['nest.topology', 'nest.topology.tests'],
+      package_dir  = {'nest.topology': '/home/archels/julich/nest-simulator-fork-/nest-simulator/topology/pynest',
+                      'nest.topology.tests': '/home/archels/julich/nest-simulator-fork-/nest-simulator/topology/pynest/tests'})
