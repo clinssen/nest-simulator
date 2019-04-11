@@ -6,8 +6,8 @@
 # e.g. by executing `CLANG_FORMAT=clang-format-3.6 ./format_all_c_c++_files.sh`.
 # By default the script starts at the current working directory ($PWD), but
 # supply a different starting directory as the first argument to the command.
-CLANG_FORMAT=/home/archels/julich/clang-format/clang+llvm-3.6.2-x86_64-linux-gnu-ubuntu-14.04/bin/clang-format
-CLANG_FORMAT_FILE=/home/archels/julich/nest-simulator-fork-/nest-simulator/.clang-format
+CLANG_FORMAT=${CLANG_FORMAT-clang-format-3.6}
+CLANG_FORMAT_FILE=${CLANG_FORMAT_FILE-.clang-format}
 
 # Drop files that should not be checked
 FILES_TO_IGNORE="libnestutil/compose.hpp librandom/knuthlfg.h librandom/knuthlfg.cpp"
