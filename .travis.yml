@@ -102,12 +102,7 @@ addons:
      - llvm-3.6-dev
      - jq
      - pep8
-     - libboost-filesystem-dev
-     - libboost-regex-dev
-     - libboost-wave-dev
-     - libboost-python-dev
-     - libboost-program-options-dev
-     - libboost-test-dev
+     - libboost-all-dev
      - python-mpi4py
 cache:
    directory:
