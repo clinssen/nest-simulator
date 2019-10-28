@@ -259,7 +259,7 @@ fi
 # Verify the CPPCHECK installation. CPPCHECK version 1.69 or later is required.
 # Previous versions of CPPCHECK halted on sli/tokenutils.cc (see https://github.com/nest/nest-simulator/pull/79)
 if $PERFORM_CPPCHECK; then
-  $CPPCHECK --enable=all --inconclusive --std=c++03 ./nest/main.cpp >/dev/null 2>&1 || error_exit "Failed to verify the CPPCHECK installation. Executable: $CPPCHECK"
+  $CPPCHECK --enable=all --language=c++ --std=c++11 --suppress=missingIncludeSystem ./nest/main.cpp >/dev/null 2>&1 || error_exit "Failed to verify the CPPCHECK installation. Executable: $CPPCHECK"
   cppcheck_version=`$CPPCHECK --version | sed 's/^Cppcheck //'`
   IFS=\. read -a cppcheck_version_a <<< "$cppcheck_version"
   if [[ ${cppcheck_version_a[0]} -lt 1 ]]; then
