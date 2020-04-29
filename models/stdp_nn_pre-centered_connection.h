@@ -127,6 +127,7 @@ public:
    */
   STDPNNPreCenteredConnection();
 
+  void foo() {}
 
   /**
    * Copy constructor.
