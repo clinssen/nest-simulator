@@ -190,6 +190,8 @@ if [ "$xSTATIC_ANALYSIS" = "1" ]; then
 
     # file_names=`find . -name "*.h" -o -name "*.c" -o -name "*.cc" -o -name "*.hpp" -o -name "*.cpp" -o -name "*.py"`
 
+    file_names=`find . -name stdp_nn_pre-centered_connection.h`
+
     for single_file_name in $file_names
     do
         echo "MSGBLD0095: File changed: $single_file_name"
