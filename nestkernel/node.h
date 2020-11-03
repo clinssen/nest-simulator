@@ -468,14 +468,6 @@ public:
   virtual void sends_secondary_event( DelayedRateConnectionEvent& re );
 
   /**
-   * Register a STDP connection
-   *
-   * @throws IllegalConnection
-   *
-   */
-  virtual void register_stdp_connection( double, double );
-
-  /**
    * Handle incoming spike events.
    * @param thrd Id of the calling thread.
    * @param e Event object.

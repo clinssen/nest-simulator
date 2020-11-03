@@ -147,7 +147,11 @@ public:
 
     ConnectionBase::check_connection_( dummy_target, s, t, receptor_type );
 
-    t.register_stdp_connection( t_lastspike_ - get_delay(), get_delay() );
+    if ( dynamic_cast< Archiving_Node* >(&t) ) {
+      throw IllegalConnection( "The target node does not support STDP synapses." );
+    }
+
+    static_cast< Archiving_Node& >(t).register_stdp_connection( t_lastspike_ - get_delay(), get_delay() );
   }
 
   void
@@ -206,7 +210,7 @@ VogelsSprekelerConnection< targetidentifierT >::send( Event& e, thread t, const 
   // get spike history in relevant range (t1, t2] from post-synaptic neuron
   std::deque< histentry >::iterator start;
   std::deque< histentry >::iterator finish;
-  target->get_history( t_lastspike_ - dendritic_delay, t_spike - dendritic_delay, &start, &finish );
+  static_cast< Archiving_Node*>(target)->get_history( t_lastspike_ - dendritic_delay, t_spike - dendritic_delay, &start, &finish );
 
   // presynaptic neuron j, post synaptic neuron i
   // Facilitation for each post synaptic spike

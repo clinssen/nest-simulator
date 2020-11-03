@@ -217,16 +217,6 @@ Node::send_test_event( Node&, rport, synindex, bool )
 }
 
 /**
- * Default implementation of register_stdp_connection() just
- * throws IllegalConnection
- */
-void
-Node::register_stdp_connection( double, double )
-{
-  throw IllegalConnection( "The target node does not support STDP synapses." );
-}
-
-/**
  * Default implementation of event handlers just throws
  * an UnexpectedEvent exception.
  * @see class UnexpectedEvent
