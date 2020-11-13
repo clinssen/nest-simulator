@@ -131,7 +131,7 @@ nest::ConnBuilder::ConnBuilder( NodeCollectionPTR sources,
   register_parameters_requiring_skipping_( *delay_ );
 
   // Structural plasticity parameters
-  // Check if both pre and post synaptic element are provided
+  // Check if both pre and postsynaptic element are provided
   if ( syn_spec->known( names::pre_synaptic_element ) and syn_spec->known( names::post_synaptic_element ) )
   {
     pre_synaptic_element_name_ = getValue< std::string >( syn_spec, names::pre_synaptic_element );
@@ -144,7 +144,7 @@ nest::ConnBuilder::ConnBuilder( NodeCollectionPTR sources,
   {
     if ( syn_spec->known( names::pre_synaptic_element ) or syn_spec->known( names::post_synaptic_element ) )
     {
-      throw BadProperty( "Structural plasticity requires both a pre and post synaptic element." );
+      throw BadProperty( "Structural plasticity requires both a pre and postsynaptic element." );
     }
 
     use_pre_synaptic_element_ = false;
@@ -1810,7 +1810,7 @@ nest::SPBuilder::SPBuilder( NodeCollectionPTR sources,
   const DictionaryDatum& syn_spec )
   : ConnBuilder( sources, targets, conn_spec, syn_spec )
 {
-  // Check that both pre and post synaptic element are provided
+  // Check that both pre and postsynaptic element are provided
   if ( not use_pre_synaptic_element_ or not use_post_synaptic_element_ )
   {
     throw BadProperty( "pre_synaptic_element and/or post_synaptic_elements is missing." );
