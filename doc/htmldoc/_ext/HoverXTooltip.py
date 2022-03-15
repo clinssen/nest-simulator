@@ -143,7 +143,7 @@ def hxt_role_ref(pattern):
         # for rtd builds
         if os.environ.get("READTHEDOCS") == "True":
             branch_name = base_url.split('/doc/')[0].split('/')[-1]
-            refuri = (f'/en/{branch_name}/glossary.html#term-{term}')
+            refuri = (f'/en/{branch_name}/ref_material/glossary.html#term-{term}')
         # for local builds
         else:
             refuri = base_url.split('userdoc')[0] + f'userdoc/html/glossary.html#term-{term}'
@@ -209,7 +209,7 @@ def get_desc_from_glossary(term):
     """
 
     try:
-        with open(str(doc_build_dir) + '/glossary.rst') as f:
+        with open(str(doc_build_dir) + '/ref_material/glossary.rst') as f:
             file_content = f.read()
 
         # generate a list of lines from file content.

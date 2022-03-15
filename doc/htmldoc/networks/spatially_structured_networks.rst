@@ -72,7 +72,7 @@ A very simple example
 
 We create a first, grid-based simple NodeCollection with the following command:
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.py
+.. literalinclude:: scripts/layers.py
     :start-after: #{ layer1 #}
     :end-before: #{ end #}
 
@@ -141,7 +141,7 @@ Grid-based layers have a default extent of :math:`1\times 1`. You can specify a
 different extent of a layer, i.e., its size in :math:`x`- and
 :math:`y`-direction by passing the ``extent`` argument to ``nest.spatial.grid()``:
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.py
+.. literalinclude:: scripts/layers.py
     :start-after: #{ layer2 #}
     :end-before: #{ end #}
 
@@ -171,7 +171,7 @@ be changed by passing the ``center`` argument to ``nest.spatial.grid()``.
 The following code creates layers centered about :math:`(0,0)`,
 :math:`(-1,1)`, and :math:`(1.5,0.5)`, respectively:
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.py
+.. literalinclude:: scripts/layers.py
     :start-after: #{ layer3 #}
     :end-before: #{ end #}
 
@@ -217,7 +217,7 @@ about :math:`y=0`, we have :math:`c_y=0`. Thus, the center coordinates
 are :math:`(n_x d/2, 0)`. The layer is created with the following code
 and shown in :numref:`fig_layer3a`:
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.py
+.. literalinclude:: scripts/layers.py
     :start-after: #{ layer3a #}
     :end-before: #{ end #}
 
@@ -243,7 +243,7 @@ parameter to ``nest.spatial.free()``. The following code creates a NodeCollectio
 extent :math:`1\times 1`, i.e., spanning the square
 :math:`[-0.5,0.5]\times[-0.5,0.5]`:
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.py
+.. literalinclude:: scripts/layers.py
     :start-after: #{ layer4 #}
     :end-before: #{ end #}
 
@@ -280,7 +280,7 @@ Note the following points:
 
 To create a spatially distributed NodeCollection from a list, do the following:
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.py
+.. literalinclude:: scripts/layers.py
     :start-after: #{ layer4b #}
     :end-before: #{ end #}
 
@@ -302,7 +302,7 @@ Although the term “layer” suggests a 2-dimensional structure, the layers
 in NEST may in fact be 3-dimensional. The example from the previous
 section may be easily extended by updating number of dimensions for the positions:
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.py
+.. literalinclude:: scripts/layers.py
     :start-after: #{ layer4_3d #}
     :end-before: #{ end #}
 
@@ -318,7 +318,7 @@ Again it is also possible to specify a list of list to create nodes in a 3-dimen
 space. Another possibility is to create a 3D grid-layer, with 3 elements passed to
 the shape argument, ``shape=[nx, ny, nz]``:
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.py
+.. literalinclude:: scripts/layers.py
     :start-after: #{ layer4_3d_b #}
     :end-before: #{ end #}
 
@@ -355,7 +355,7 @@ introduction of periodic boundary conditions.
 You specify periodic boundary conditions for a NodeCollection using
 the entry ``edge_wrap``:
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.py
+.. literalinclude:: scripts/layers.py
     :start-after: #{ player #}
     :end-before: #{ end #}
 
@@ -399,11 +399,11 @@ be of interest:
    properties of the NodeCollection (``l`` is the layer created at the beginning
    of this guide):
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.py
+.. literalinclude:: scripts/layers.py
     :start-after: #{ layer1s #}
     :end-before: #{ end #}
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.log
+.. literalinclude:: scripts/layers.log
     :start-after: #{ layer1s.log #}
     :end-before: #{ end.log #}
 
@@ -419,11 +419,11 @@ not change properties of the spatially distributed NodeCollection.
    :py:func:`.Connect` with spatial dependence, or visualization of layers) can
    only be used on NodeCollections created with spatial distribution.
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.py
+.. literalinclude:: scripts/layers.py
     :start-after: #{ layer1p #}
     :end-before: #{ end #}
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.log
+.. literalinclude:: scripts/layers.log
     :start-after: #{ layer1p.log #}
     :end-before: #{ end.log #}
 
@@ -539,7 +539,7 @@ targets.
 
 Here is a simple example, cf. :numref:`fig_conn1`
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn1 #}
     :end-before: #{ end #}
 
@@ -625,7 +625,7 @@ Rectangular
    specified by its lower left and upper right corners, measured in the
    same unit as element coordinates. Example:
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn2r #}
     :end-before: #{ end #}
 
@@ -633,7 +633,7 @@ Circular
    All nodes within a circle are connected. The area is specified by its
    radius.
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn2c #}
     :end-before: #{ end #}
 
@@ -642,7 +642,7 @@ Doughnut
    nodes *on* the inner circle are not connected. The area is specified
    by the radii of the inner and outer circles.
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn2d #}
     :end-before: #{ end #}
 
@@ -650,7 +650,7 @@ Elliptical
    All nodes within an ellipsis are connected. The area is specified by
    its major and minor axis.
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn2e #}
     :end-before: #{ end #}
 
@@ -672,19 +672,19 @@ the mask dictionary. The anchor is a 2D vector specifying the location
 of the mask center relative to the driver node, as in the following
 examples (cf.  :numref:`fig_conn2_b`).
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn2ro #}
     :end-before: #{ end #}
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn2co #}
     :end-before: #{ end #}
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn2do #}
     :end-before: #{ end #}
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn2eo #}
     :end-before: #{ end #}
 
@@ -703,11 +703,11 @@ add an ``'azimuth_angle'`` entry in the specific mask dictionary. The
 ``azimuth_angle`` is measured in degrees and is the rotational angle
 from the x-axis to the y-axis.
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn2rr #}
     :end-before: #{ end #}
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn2er #}
     :end-before: #{ end #}
 
@@ -733,7 +733,7 @@ Box
    by its lower left and upper right corners, measured in the same unit
    as element coordinates. Example:
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn_3d_a #}
     :end-before: #{ end #}
 
@@ -741,7 +741,7 @@ Spherical
    All nodes within a sphere are connected. The area is specified by its
    radius.
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn_3d_b #}
     :end-before: #{ end #}
 
@@ -749,7 +749,7 @@ Ellipsoidal
    All nodes within an ellipsoid are connected. The area is specified by
    its major, minor, and polar axis.
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn_3d_c #}
     :end-before: #{ end #}
 
@@ -784,7 +784,7 @@ these, you specify the size of the mask not by lower left and upper
 right corner coordinates, but give their size in x and y direction, as in
 this example:
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn3 #}
     :end-before: #{ end #}
 
@@ -794,13 +794,13 @@ grid index :math:`[0,0]`\ (see :ref:`2.1.1 <sec_spatial_verysimple>`), is
 aligned with the driver node. You can change this alignment by
 specifying an *anchor* for the mask:
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn3c #}
     :end-before: #{ end #}
 
 You can even place the anchor outside the mask:
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn3x #}
     :end-before: #{ end #}
 
@@ -961,7 +961,7 @@ Several examples follow. They are illustrated in  :numref:`fig_conn4`.
 Constant
    Fixed connection probability:
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn4cp #}
     :end-before: #{ end #}
 
@@ -971,7 +971,7 @@ Gaussian
    probability is 1 for :math:`d=0` and falls off with a “standard
    deviation” of :math:`\sigma=1`:
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn4g #}
     :end-before: #{ end #}
 
@@ -981,7 +981,7 @@ Cut-off Gaussian
 
 .. TODO: Reference to full Parameter table with nest.logic.conditional().
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn4cut #}
     :end-before: #{ end #}
 
@@ -991,7 +991,7 @@ Cut-off Gaussian
    :math:`y`- directions. This probability depends on displacement, not
    only on distance:
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn42d #}
     :end-before: #{ end #}
 
@@ -1013,7 +1013,7 @@ passed along in a synapse dictionary to the ``Connect()`` call.
 
 
 Figure :numref:`fig_conn5` illustrates weights and delays generated using these
-parameters. The code examples used to generate the figures are shown below.
+parameters. The code examples used to generate the spatially_structured_networks/figures are shown below.
 All examples use a spatially distributed NodeCollection
 of 51 nodes placed on a line; the line is centered about :math:`(25,0)`,
 so that the leftmost node has coordinates :math:`(0,0)`. The distance
@@ -1022,7 +1022,7 @@ entire NodeCollection and is centered about the driver node.
 
 
 Linear example
-  .. literalinclude:: spatially_structured_networks/scripts/connections.py
+  .. literalinclude:: scripts/connections.py
       :start-after: #{ conn5lin #}
       :end-before: #{ end #}
 
@@ -1036,7 +1036,7 @@ Linear example
 
 
 Linear example with periodic boundary conditions
-  .. literalinclude:: spatially_structured_networks/scripts/connections.py
+  .. literalinclude:: scripts/connections.py
       :start-after: #{ conn5linpbc #}
       :end-before: #{ end #}
 
@@ -1048,11 +1048,11 @@ Linear example with periodic boundary conditions
 
 
 Various spatially dependent distributions
-  .. literalinclude:: spatially_structured_networks/scripts/connections.py
+  .. literalinclude:: scripts/connections.py
       :start-after: #{ conn5exp #}
       :end-before: #{ end #}
 
-  .. literalinclude:: spatially_structured_networks/scripts/connections.py
+  .. literalinclude:: scripts/connections.py
       :start-after: #{ conn5gauss #}
       :end-before: #{ end #}
 
@@ -1063,7 +1063,7 @@ Various spatially dependent distributions
 
 
 Randomized weights and delays
-  .. literalinclude:: spatially_structured_networks/scripts/connections.py
+  .. literalinclude:: scripts/connections.py
       :start-after: #{ conn5uniform #}
       :end-before: #{ end #}
 
@@ -1096,13 +1096,13 @@ linear (actually affine) with respect to the displacement between the nodes, of 
 \ where :math:`d_x` and :math:`d_y` are the displacements between the source and
 target neuron on the x and y axis, respectively. The parameter is then simply:
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn_param_design #}
     :end-before: #{ end #}
 
 This can be directly plugged into the :py:func:`.Connect` function:
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn_param_design_ex #}
     :end-before: #{ end #}
 
@@ -1202,7 +1202,7 @@ distance. For the connection probability and parameter values below we have
 The resulting distribution of distances between connected nodes is shown in
  :numref:`fig_conn6`.
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn6 #}
     :end-before: #{ end #}
 
@@ -1229,7 +1229,7 @@ model in NEST, ``static_synapse``. You can specify a different model by
 adding a ``'synapse_model'`` entry to the synapse specification
 dictionary, as in this example:
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn8 #}
     :end-before: #{ end #}
 
@@ -1250,14 +1250,14 @@ needs to be specified and optionally also an anchor for shifting the
 center of the mask. As demonstrated in the following example,
 stimulation devices have to be connected as the source layer.
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn9 #}
     :end-before: #{ end #}
 
 While recording devices, on the other hand, have to be connected as
 the target layer (see also the following section):
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn10 #}
     :end-before: #{ end #}
 
@@ -1269,7 +1269,7 @@ another NodeCollection with spatial extent. This is especially true for spike re
 create a single spike recorder and connect all neurons in the spatially
 distributed NodeCollection to that spike recorder:
 
-.. literalinclude:: spatially_structured_networks/scripts/connections.py
+.. literalinclude:: scripts/connections.py
     :start-after: #{ conn11 #}
     :end-before: #{ end #}
 
@@ -1375,7 +1375,7 @@ which connects to itself with Gaussian connections. The resulting graphics
 is shown in :numref:`fig_vislayer`. All elements and the targets of the
 center neuron are shown, as well as mask and connection probability.
 
-.. literalinclude:: spatially_structured_networks/scripts/layers.py
+.. literalinclude:: scripts/layers.py
     :start-after: #{ vislayer #}
     :end-before: #{ end #}
 
@@ -1454,8 +1454,7 @@ Adding masks in a module
 If using parameters to define a connection boundary is not efficient enough, or
 if you need more flexibility in defining the mask, you can add a custom mask,
 written in C++, and add it to NEST via an extension module. For more information
-on writing such modules, see the
-`NEST extension module repository <https://github.com/nest/nest-extension_module>`_.
+on writing such modules, see the :doc:`NEST extension module repository <extmod:index>`.
 
 To add a mask, a subclass of ``nest::Mask<D>`` must be defined, where ``D``
 is the dimension (2 or 3). In this case we will define a 2-dimensional
