@@ -26,13 +26,6 @@
 // Generated includes:
 #include "config.h"
 
-#ifdef HAVE_GSL
-
-// External includes:
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_matrix.h>
-#include <gsl/gsl_odeiv.h>
-
 // Includes from nestkernel:
 #include "clopath_archiving_node.h"
 #include "connection.h"
@@ -47,7 +40,7 @@ namespace nest
 {
 
 /**
- * Function computing right-hand side of ODE for GSL solver.
+ * Function computing right-hand side of ODE for solver.
  * @note Must be declared here so we can befriend it in class.
  * @note Must have C-linkage for passing to GSL. Internally, it is
  *       a first-class C++ function, but cannot be a member function
@@ -160,14 +153,6 @@ t_clamp  ms     Duration of clamping of Membrane potential after a spike
 V_clamp  mV     Value to which the Membrane potential is clamped
 =======  ====== ============================================================
 
-============= ======= =========================================================
-**Integration parameters**
--------------------------------------------------------------------------------
-gsl_error_tol real    This parameter controls the admissible error of the
-                      GSL integrator. Reduce it if NEST complains about
-                      numerical instabilities.
-============= ======= =========================================================
-
 Sends
 +++++
 
@@ -270,8 +255,6 @@ private:
     double I_sp;               //!< Depolarizing spike afterpotential current in pA
     double I_e;                //!< Intrinsic current in pA
 
-    double gsl_error_tol; //!< Error bound for GSL integrator
-
     double t_clamp_; //!< The membrane potential is clamped for the duration of t_clamp (in ms) after each spike
     double V_clamp_; //!< The membrane potential is clamped to V_clamp (in mV)
 
@@ -339,18 +322,6 @@ public:
     /** buffers and sums up incoming spikes/currents */
     RingBuffer spikes_;
     RingBuffer currents_;
-
-    /** GSL ODE stuff */
-    gsl_odeiv_step* s_;    //!< stepping function
-    gsl_odeiv_control* c_; //!< adaptive stepsize control function
-    gsl_odeiv_evolve* e_;  //!< evolution function
-    gsl_odeiv_system sys_; //!< struct describing the GSL system
-
-    // Since IntergrationStep_ is initialized with step_, and the resolution
-    // cannot change after nodes have been created, it is safe to place both
-    // here.
-    double step_;            //!< step size in ms
-    double IntegrationStep_; //!< current integration time step, updated by GSL
 
     /**
      * Input current injected by CurrentEvent.
@@ -469,7 +440,5 @@ aeif_psc_delta_clopath::set_status( const DictionaryDatum& d )
 }
 
 } // namespace
-
-#endif // HAVE_GSL
 
 #endif // AEIF_PSC_DELTA_CLOPATH_H

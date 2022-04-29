@@ -22,8 +22,6 @@
 
 #include "aeif_psc_delta_clopath.h"
 
-#ifdef HAVE_GSL
-
 // C++ includes:
 #include <cmath>
 #include <cstdio>
@@ -129,7 +127,7 @@ nest::aeif_psc_delta_clopath_dynamics( double, const double y[], double f[], voi
 
   f[ S::U_BAR_BAR ] = ( -u_bar_bar + u_bar_minus ) / node.P_.tau_u_bar_bar;
 
-  return GSL_SUCCESS;
+  return 0;  // GSL_SUCCESS
 }
 
 /* ----------------------------------------------------------------
@@ -156,7 +154,6 @@ nest::aeif_psc_delta_clopath::Parameters_::Parameters_()
   , b( 80.5 )               // pA
   , I_sp( 400.0 )           // pA
   , I_e( 0.0 )              // pA
-  , gsl_error_tol( 1e-6 )
   , t_clamp_( 2.0 )         // ms
   , V_clamp_( 33.0 )        // mV
 {
@@ -225,7 +222,6 @@ nest::aeif_psc_delta_clopath::Parameters_::get( DictionaryDatum& d ) const
   def< double >( d, names::tau_u_bar_bar, tau_u_bar_bar );
   def< double >( d, names::I_e, I_e );
   def< double >( d, names::V_peak, V_peak_ );
-  def< double >( d, names::gsl_error_tol, gsl_error_tol );
   def< double >( d, names::V_clamp, V_clamp_ );
   def< double >( d, names::t_clamp, t_clamp_ );
 }
@@ -255,8 +251,6 @@ nest::aeif_psc_delta_clopath::Parameters_::set( const DictionaryDatum& d, Node* 
   updateValueParam< double >( d, names::tau_u_bar_bar, tau_u_bar_bar, node );
 
   updateValueParam< double >( d, names::I_e, I_e, node );
-
-  updateValueParam< double >( d, names::gsl_error_tol, gsl_error_tol, node );
 
   updateValueParam< double >( d, names::V_clamp, V_clamp_, node );
   updateValueParam< double >( d, names::t_clamp, t_clamp_, node );
@@ -315,11 +309,6 @@ nest::aeif_psc_delta_clopath::Parameters_::set( const DictionaryDatum& d, Node* 
   {
     throw BadProperty( "All time constants must be strictly positive." );
   }
-
-  if ( gsl_error_tol <= 0. )
-  {
-    throw BadProperty( "The gsl_error_tol must be strictly positive." );
-  }
 }
 
 void
@@ -344,9 +333,6 @@ nest::aeif_psc_delta_clopath::State_::set( const DictionaryDatum& d, const Param
 
 nest::aeif_psc_delta_clopath::Buffers_::Buffers_( aeif_psc_delta_clopath& n )
   : logger_( n )
-  , s_( 0 )
-  , c_( 0 )
-  , e_( 0 )
 {
   // Initialization of the remaining members is deferred to
   // init_buffers_().
@@ -354,9 +340,6 @@ nest::aeif_psc_delta_clopath::Buffers_::Buffers_( aeif_psc_delta_clopath& n )
 
 nest::aeif_psc_delta_clopath::Buffers_::Buffers_( const Buffers_&, aeif_psc_delta_clopath& n )
   : logger_( n )
-  , s_( 0 )
-  , c_( 0 )
-  , e_( 0 )
 {
   // Initialization of the remaining members is deferred to
   // init_buffers_().
@@ -385,19 +368,6 @@ nest::aeif_psc_delta_clopath::aeif_psc_delta_clopath( const aeif_psc_delta_clopa
 
 nest::aeif_psc_delta_clopath::~aeif_psc_delta_clopath()
 {
-  // GSL structs may not have been allocated, so we need to protect destruction
-  if ( B_.s_ )
-  {
-    gsl_odeiv_step_free( B_.s_ );
-  }
-  if ( B_.c_ )
-  {
-    gsl_odeiv_control_free( B_.c_ );
-  }
-  if ( B_.e_ )
-  {
-    gsl_odeiv_evolve_free( B_.e_ );
-  }
 }
 
 /* ----------------------------------------------------------------
@@ -413,41 +383,9 @@ nest::aeif_psc_delta_clopath::init_buffers_()
 
   B_.logger_.reset();
 
-  B_.step_ = Time::get_resolution().get_ms();
-
   // We must integrate this model with high-precision to obtain decent results
-  B_.IntegrationStep_ = std::min( 0.01, B_.step_ );
+//  B_.IntegrationStep_ = std::min( 0.01, B_.step_ );      // XXX: not clear what is happening here, model is being integrated at different resolution?! Just set dt in nestkernel to 0.01!
 
-  if ( B_.s_ == 0 )
-  {
-    B_.s_ = gsl_odeiv_step_alloc( gsl_odeiv_step_rkf45, State_::STATE_VEC_SIZE );
-  }
-  else
-  {
-    gsl_odeiv_step_reset( B_.s_ );
-  }
-  if ( B_.c_ == 0 )
-  {
-    B_.c_ = gsl_odeiv_control_yp_new( P_.gsl_error_tol, P_.gsl_error_tol );
-  }
-  else
-  {
-    gsl_odeiv_control_init( B_.c_, P_.gsl_error_tol, P_.gsl_error_tol, 0.0, 1.0 );
-  }
-
-  if ( B_.e_ == 0 )
-  {
-    B_.e_ = gsl_odeiv_evolve_alloc( State_::STATE_VEC_SIZE );
-  }
-  else
-  {
-    gsl_odeiv_evolve_reset( B_.e_ );
-  }
-
-  B_.sys_.jacobian = NULL;
-  B_.sys_.dimension = State_::STATE_VEC_SIZE;
-  B_.sys_.params = reinterpret_cast< void* >( this );
-  B_.sys_.function = aeif_psc_delta_clopath_dynamics;
 
   B_.I_stim_ = 0.0;
 
@@ -483,92 +421,80 @@ nest::aeif_psc_delta_clopath::update( const Time& origin, const long from, const
   {
     double t = 0.0;
 
-    // numerical integration with adaptive step size control:
-    // ------------------------------------------------------
-    // gsl_odeiv_evolve_apply performs only a single numerical
-    // integration step, starting from t and bounded by step;
-    // the while-loop ensures integration over the whole simulation
-    // step (0, step] if more than one integration step is needed due
-    // to a small integration step size;
-    // note that (t+IntegrationStep > step) leads to integration over
-    // (t, step] and afterwards setting t to step, but it does not
-    // enforce setting IntegrationStep to step-t
-    while ( t < B_.step_ )
+    // numerical integration step from ``t`` to ``t + Time::get_resolution().get_ms()``
+    double dydt[ State_::STATE_VEC_SIZE ];
+
+    aeif_psc_delta_clopath_dynamics(t, S_.y_, dydt, reinterpret_cast< void* >( this ));
+
+    for ( size_t i = 0; i < State_::STATE_VEC_SIZE; ++i)
     {
-      const int status = gsl_odeiv_evolve_apply( B_.e_,
-        B_.c_,
-        B_.s_,
-        &B_.sys_,             // system of ODE
-        &t,                   // from t
-        B_.step_,             // to t <= step
-        &B_.IntegrationStep_, // integration step size
-        S_.y_ );              // neuronal state
+      S_.y_[ i ] += dydt[ i ] * Time::get_resolution().get_ms();
 
-      if ( status != GSL_SUCCESS )
-      {
-        throw GSLSolverFailure( get_name(), status );
-      }
-      // check for unreasonable values; we allow V_M to explode
-      if ( S_.y_[ State_::V_M ] < -1e3 || S_.y_[ State_::W ] < -1e6 || S_.y_[ State_::W ] > 1e6 )
-      {
-        throw NumericalInstability( get_name() );
-      }
+      assert (Time::get_resolution().get_ms() <= 0.011); // XXX: just a sanity, check, needs to be removed!
+      //std::cout << "step = " << Time::get_resolution().get_ms() << "\n";
+      //std::cout << "dydt [ " << i << " ] = " << S_.y_[i] << "\n";
+    }
 
-      // spikes are handled inside the while-loop
-      // due to spike-driven adaptation
-      if ( S_.r_ == 0 && S_.clamp_r_ == 0 )
-      {
-        // neuron not refractory
-        S_.y_[ State_::V_M ] = S_.y_[ State_::V_M ] + B_.spikes_.get_value( lag );
-      }
-      else // neuron is absolute refractory
-      {
-        B_.spikes_.get_value( lag ); // clear buffer entry, ignore spike
-      }
+    // check for unreasonable values; we allow V_M to explode
+    if ( S_.y_[ State_::V_M ] < -1e3 || S_.y_[ State_::W ] < -1e6 || S_.y_[ State_::W ] > 1e6 )
+    {
+      throw NumericalInstability( get_name() );
+    }
 
-      // set the right threshold depending on Delta_T
-      if ( P_.Delta_T == 0. )
-      {
-        V_.V_peak_ = S_.y_[ State_::V_TH ]; // same as IAF dynamics for spikes if
-                                            // Delta_T == 0.
-      }
+    // spikes are handled inside the while-loop
+    // due to spike-driven adaptation
+    if ( S_.r_ == 0 && S_.clamp_r_ == 0 )
+    {
+      // neuron not refractory
+      S_.y_[ State_::V_M ] = S_.y_[ State_::V_M ] + B_.spikes_.get_value( lag );
+    }
+    else // neuron is absolute refractory
+    {
+      B_.spikes_.get_value( lag ); // clear buffer entry, ignore spike
+    }
 
-      if ( S_.y_[ State_::V_M ] >= V_.V_peak_ && S_.clamp_r_ == 0 )
-      {
-        S_.y_[ State_::V_M ] = P_.V_clamp_;
-        S_.y_[ State_::W ] += P_.b;   // spike-driven adaptation
-        S_.y_[ State_::Z ] = P_.I_sp; // depolarizing spike afterpotential current
-        S_.y_[ State_::V_TH ] = P_.V_th_max;
+    // set the right threshold depending on Delta_T
+    if ( P_.Delta_T == 0. )
+    {
+      V_.V_peak_ = S_.y_[ State_::V_TH ]; // same as IAF dynamics for spikes if
+                                          // Delta_T == 0.
+    }
 
-        /* Initialize clamping step counter.
-         * - We need to add 1 to compensate for count-down immediately after
-         *   while loop.
-         * - If neuron does not use clamping, set to 0
-         */
-        S_.clamp_r_ = V_.clamp_counts_ > 0 ? V_.clamp_counts_ + 1 : 0;
+    if ( S_.y_[ State_::V_M ] >= V_.V_peak_ && S_.clamp_r_ == 0 )
+    {
+      S_.y_[ State_::V_M ] = P_.V_clamp_;
+      S_.y_[ State_::W ] += P_.b;   // spike-driven adaptation
+      S_.y_[ State_::Z ] = P_.I_sp; // depolarizing spike afterpotential current
+      S_.y_[ State_::V_TH ] = P_.V_th_max;
 
-        set_spiketime( Time::step( origin.get_steps() + lag + 1 ) );
-        SpikeEvent se;
-        kernel().event_delivery_manager.send( *this, se, lag );
-      }
-      else if ( S_.clamp_r_ == 1 )
-      {
-        S_.y_[ State_::V_M ] = P_.V_reset_;
-        S_.clamp_r_ = 0;
+      /* Initialize clamping step counter.
+       * - We need to add 1 to compensate for count-down immediately after
+       *   while loop.
+       * - If neuron does not use clamping, set to 0
+       */
+      S_.clamp_r_ = V_.clamp_counts_ > 0 ? V_.clamp_counts_ + 1 : 0;
 
-        /* Initialize refractory step counter.
-         * - We need to add 1 to compensate for count-down immediately after
-         *   while loop.
-         * - If neuron has no refractory time, set to 0 to avoid refractory
-         *   artifact inside while loop.
-         */
-        S_.r_ = V_.refractory_counts_ > 0 ? V_.refractory_counts_ + 1 : 0;
-      }
+      set_spiketime( Time::step( origin.get_steps() + lag + 1 ) );
+      SpikeEvent se;
+      kernel().event_delivery_manager.send( *this, se, lag );
+    }
+    else if ( S_.clamp_r_ == 1 )
+    {
+      S_.y_[ State_::V_M ] = P_.V_reset_;
+      S_.clamp_r_ = 0;
 
-      if ( S_.r_ > 0 )
-      {
-        S_.y_[ State_::V_M ] = P_.V_reset_;
-      }
+      /* Initialize refractory step counter.
+       * - We need to add 1 to compensate for count-down immediately after
+       *   while loop.
+       * - If neuron has no refractory time, set to 0 to avoid refractory
+       *   artifact inside while loop.
+       */
+      S_.r_ = V_.refractory_counts_ > 0 ? V_.refractory_counts_ + 1 : 0;
+    }
+
+    if ( S_.r_ > 0 )
+    {
+      S_.y_[ State_::V_M ] = P_.V_reset_;
     }
 
     // save data for Clopath synapses
@@ -623,5 +549,3 @@ nest::aeif_psc_delta_clopath::handle( DataLoggingRequest& e )
 {
   B_.logger_.handle( e );
 }
-
-#endif // HAVE_GSL

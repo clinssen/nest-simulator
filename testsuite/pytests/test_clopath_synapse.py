@@ -72,7 +72,8 @@ class ClopathSynapseTestCase(unittest.TestCase):
 
         # This is done using the spike pairing experiment of
         # Clopath et al. 2010. First we specify the parameters
-        resolution = 0.1
+        delay = 0.1
+        resolution = 0.01
         init_w = 0.5
         spike_times_pre = [
             [29.,  129.,  229.,  329.,  429.],
@@ -138,7 +139,7 @@ class ClopathSynapseTestCase(unittest.TestCase):
                                             "spike_times": s_t_pre})
 
                 nest.Connect(spike_gen_pre, prrt_nrn,
-                             syn_spec={"delay": resolution})
+                             syn_spec={"delay": delay})
 
                 if(nrn_model == "aeif_psc_delta_clopath"):
                     conn_weight = 80.0
@@ -150,7 +151,7 @@ class ClopathSynapseTestCase(unittest.TestCase):
                     "spike_times": s_t_post})
 
                 nest.Connect(spike_gen_post, nrn, syn_spec={
-                    "delay": resolution, "weight": conn_weight})
+                    "delay": delay, "weight": conn_weight})
 
                 # Create weight recorder
                 wr = nest.Create('weight_recorder', 1)
@@ -160,7 +161,7 @@ class ClopathSynapseTestCase(unittest.TestCase):
                                {"weight_recorder": wr})
 
                 syn_dict = {"synapse_model": "clopath_synapse_rec",
-                            "weight": init_w, "delay": resolution}
+                            "weight": init_w, "delay": delay}
                 nest.Connect(prrt_nrn, nrn, syn_spec=syn_dict)
 
                 # Simulation
@@ -190,6 +191,7 @@ class ClopathSynapseTestCase(unittest.TestCase):
 
         nest.set_verbosity('M_WARNING')
         nest.ResetKernel()
+        nest.resolution = 0.01
 
         # Create neurons and devices
         nrns = nest.Create('aeif_psc_delta_clopath', 2, {'V_m': -70.6})
