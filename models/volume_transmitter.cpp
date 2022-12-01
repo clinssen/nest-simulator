@@ -113,7 +113,9 @@ nest::volume_transmitter::update( const Time&, const long from, const long to )
       % ( P_.deliver_interval_ * kernel().connection_manager.get_min_delay() )
     == 0 )
   {
-    double t_trig = Time( Time::step( kernel().simulation_manager.get_slice_origin().get_steps() + to ) ).get_ms();
+//    double t_trig = Time( Time::step( kernel().simulation_manager.get_slice_origin().get_steps() + to ) ).get_ms();
+    double t_trig = Time( Time::step( kernel().simulation_manager.get_slice_origin().get_steps() ) ).get_ms();
+std::cout<<"In volume_transmitter::update(): triggering update at t_trig = " << t_trig << "\n";
 
     if ( not B_.spikecounter_.empty() )
     {

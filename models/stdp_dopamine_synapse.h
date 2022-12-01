@@ -576,9 +576,9 @@ std::cout << "in send(): t_pre_spike = " << t_spike << "\n";
 
   // depression due to new pre-synaptic spike
     std::cout << "\t\tcase 4\n";
-if (t0 < t_spike) {
+//if (t0 < t_spike) {
   process_dopa_spikes_( dopa_spikes, t0, t_spike, cp );
-}
+//}
 
   depress_( target->get_K_value( t_spike - dendritic_delay ), cp );
 
@@ -609,8 +609,8 @@ std::cout<<"In trigger_update_weight(): t_trig = " << t_trig << "\n";
   // purely dendritic delay
   double dendritic_delay = get_delay();
 
-  // get spike history in relevant range (t_last_update, t_trig] from postsyn.
-  // neuron
+  // get spike history in relevant range (t_last_update - dendritic_delay, t_trig - dendritic_delay] from
+  // postsynaptic neuron
   std::deque< histentry >::iterator start;
   std::deque< histentry >::iterator finish;
   get_target( t )->get_history( t_last_update_ - dendritic_delay, t_trig - dendritic_delay, &start, &finish );
