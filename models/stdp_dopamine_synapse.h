@@ -420,9 +420,12 @@ inline void
 stdp_dopamine_synapse< targetidentifierT >::update_dopamine_( const std::vector< spikecounter >& dopa_spikes,
   const STDPDopaCommonProperties& cp )
 {
+
   double minus_dt = dopa_spikes[ dopa_spikes_idx_ ].spike_time_ - dopa_spikes[ dopa_spikes_idx_ + 1 ].spike_time_;
+std::cout<<"\t\tIn update_dopamine_: minus_dt = " << minus_dt << ", old n_ = " << n_;
   ++dopa_spikes_idx_;
   n_ = n_ * std::exp( minus_dt / cp.tau_n_ ) + dopa_spikes[ dopa_spikes_idx_ ].multiplicity_ / cp.tau_n_;
+std::cout<<", new n_ = " << n_<<"\n";
 }
 
 template < typename targetidentifierT >
@@ -432,6 +435,7 @@ stdp_dopamine_synapse< targetidentifierT >::update_weight_( double c0,
   double minus_dt,
   const STDPDopaCommonProperties& cp )
 {
+std::cout << "\t\tIn update_weight_: c0 = " << c0 << ", n0 = " << n0 << ", minus_dt = " << minus_dt << ", old weight: " << weight_;
   const double taus_ = ( cp.tau_c_ + cp.tau_n_ ) / ( cp.tau_c_ * cp.tau_n_ );
   weight_ = weight_
     - c0
@@ -446,6 +450,7 @@ stdp_dopamine_synapse< targetidentifierT >::update_weight_( double c0,
   {
     weight_ = cp.Wmax_;
   }
+std::cout << ", new weight: " << weight_<<"\n";
 }
 
 template < typename targetidentifierT >
@@ -455,11 +460,14 @@ stdp_dopamine_synapse< targetidentifierT >::process_dopa_spikes_( const std::vec
   double t1,
   const STDPDopaCommonProperties& cp )
 {
+//assert(t1>=t0);
+std::cout << "In process_dopa_spikes_(): c_ = " <<c_ << ", n_ = " << n_ << ", weight_ = " << weight_ <<", t0 = " << t0 << ", t1 = " << t1 << "\n";
   // process dopa spikes in (t0, t1]
   // propagate weight from t0 to t1
   if ( ( dopa_spikes.size() > dopa_spikes_idx_ + 1 )
     and ( t1 - dopa_spikes[ dopa_spikes_idx_ + 1 ].spike_time_ > -1.0 * kernel().connection_manager.get_stdp_eps() ) )
   {
+std::cout<<"\t dopa spikes!\n";
     // there is at least 1 dopa spike in (t0, t1]
     // propagate weight up to first dopa spike and update dopamine trace
     // weight and eligibility c are at time t0 but dopamine trace n is at time
@@ -474,6 +482,7 @@ stdp_dopamine_synapse< targetidentifierT >::process_dopa_spikes_( const std::vec
     while ( ( dopa_spikes.size() > dopa_spikes_idx_ + 1 )
       and ( t1 - dopa_spikes[ dopa_spikes_idx_ + 1 ].spike_time_ > -1.0 * kernel().connection_manager.get_stdp_eps() ) )
     {
+      std::cout << "\t  processing dopa spike at t = " << dopa_spikes[ dopa_spikes_idx_ ].spike_time_ << "\n";
       // propagate weight up to next dopa spike and update dopamine trace
       // weight and dopamine trace n are at time of last dopa spike td but
       // eligibility c is at time
@@ -493,6 +502,7 @@ stdp_dopamine_synapse< targetidentifierT >::process_dopa_spikes_( const std::vec
   }
   else
   {
+std::cout<<"\t no dopa spikes!\n";
     // no dopamine spikes in (t0, t1]
     // weight and eligibility c are at time t0 but dopamine trace n is at time
     // of last dopa spike
@@ -502,7 +512,9 @@ stdp_dopamine_synapse< targetidentifierT >::process_dopa_spikes_( const std::vec
   }
 
   // update eligibility trace c for interval (t0, t1]
+std::cout << "\tupdate eligibility, c_ = " << c_;
   c_ = c_ * std::exp( ( t0 - t1 ) / cp.tau_c_ );
+std::cout << ", after: c_ = " << c_ << "\n";
 }
 
 template < typename targetidentifierT >
@@ -534,7 +546,7 @@ stdp_dopamine_synapse< targetidentifierT >::send( Event& e, thread t, const STDP
   double dendritic_delay = get_delay();
 
   double t_spike = e.get_stamp().get_ms();
-
+std::cout << "in send(): t_pre_spike = " << t_spike << "\n";
   // get history of dopamine spikes
   const std::vector< spikecounter >& dopa_spikes = cp.vt_->deliver_spikes();
 
@@ -549,6 +561,7 @@ stdp_dopamine_synapse< targetidentifierT >::send( Event& e, thread t, const STDP
   double minus_dt;
   while ( start != finish )
   {
+    std::cout << "\t\tcase 3\n";
     process_dopa_spikes_( dopa_spikes, t0, start->t_ + dendritic_delay, cp );
     t0 = start->t_ + dendritic_delay;
     minus_dt = t_last_update_ - t0;
@@ -562,7 +575,11 @@ stdp_dopamine_synapse< targetidentifierT >::send( Event& e, thread t, const STDP
   }
 
   // depression due to new pre-synaptic spike
+    std::cout << "\t\tcase 4\n";
+if (t0 < t_spike) {
   process_dopa_spikes_( dopa_spikes, t0, t_spike, cp );
+}
+
   depress_( target->get_K_value( t_spike - dendritic_delay ), cp );
 
   e.set_receiver( *target );
@@ -583,6 +600,8 @@ stdp_dopamine_synapse< targetidentifierT >::trigger_update_weight( thread t,
   const double t_trig,
   const STDPDopaCommonProperties& cp )
 {
+//std::cout<<"In trigger_update_weight(): t_trig = " << t_trig << ", kernel time = " << kernel().simulation_manager.get_time().get_ms() << "\n";
+std::cout<<"In trigger_update_weight(): t_trig = " << t_trig << "\n";
   // propagate all state variables to time t_trig
   // this does not include the depression trace K_minus, which is updated in the
   // postsyn. neuron
@@ -601,6 +620,7 @@ stdp_dopamine_synapse< targetidentifierT >::trigger_update_weight( thread t,
   double minus_dt;
   while ( start != finish )
   {
+    std::cout << "\t\tcase 1\n";
     process_dopa_spikes_( dopa_spikes, t0, start->t_ + dendritic_delay, cp );
     t0 = start->t_ + dendritic_delay;
     minus_dt = t_last_update_ - t0;
@@ -611,6 +631,7 @@ stdp_dopamine_synapse< targetidentifierT >::trigger_update_weight( thread t,
   // propagate weight, eligibility trace c, dopamine trace n and facilitation
   // trace K_plus to time t_trig but do not increment/decrement as there are no
   // spikes to be handled at t_trig
+    std::cout << "\t\tcase 2\n";
   process_dopa_spikes_( dopa_spikes, t0, t_trig, cp );
   n_ = n_ * std::exp( ( dopa_spikes[ dopa_spikes_idx_ ].spike_time_ - t_trig ) / cp.tau_n_ );
   Kplus_ = Kplus_ * std::exp( ( t_last_update_ - t_trig ) / cp.tau_plus_ );
