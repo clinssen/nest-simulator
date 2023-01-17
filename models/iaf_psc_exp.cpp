@@ -286,6 +286,8 @@ nest::iaf_psc_exp::update( const Time& origin, const long from, const long to )
   assert( to >= 0 and ( delay ) from < kernel().connection_manager.get_min_delay() );
   assert( from < to );
 
+std::cout << "In iaf_psc_exp::update(): t = " << origin.get_ms() << " ms\n";
+
   const double h = Time::get_resolution().get_ms();
 
   // evolve from timestep 'from' to timestep 'to' with steps of h each
@@ -329,6 +331,7 @@ nest::iaf_psc_exp::update( const Time& origin, const long from, const long to )
       S_.V_m_ = P_.V_reset_;
 
       set_spiketime( Time::step( origin.get_steps() + lag + 1 ) );
+std::cout << "In iaf_psc_exp::update(): emitting spike: t_sp = " << Time( Time::step( origin.get_steps() + lag + 1 )).get_ms() << " ms\n";
 
       SpikeEvent se;
       kernel().event_delivery_manager.send( *this, se, lag );
