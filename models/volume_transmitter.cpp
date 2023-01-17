@@ -93,8 +93,10 @@ nest::volume_transmitter::pre_run_hook()
 }
 
 void
-nest::volume_transmitter::update( const Time&, const long from, const long to )
+nest::volume_transmitter::update( const Time& origin, const long from, const long to )
 {
+  std::cout << "In volume_transmitter::update(): t = " << origin.get_ms() << " ms\n";
+
   // spikes that arrive in this time slice are stored in spikecounter_
   double t_spike;
   double multiplicity;
@@ -103,6 +105,8 @@ nest::volume_transmitter::update( const Time&, const long from, const long to )
     multiplicity = B_.neuromodulatory_spikes_.get_value( lag );
     if ( multiplicity > 0 )
     {
+        std::cout << "\tthere is a spike!\n";
+
       t_spike = Time( Time::step( kernel().simulation_manager.get_slice_origin().get_steps() + lag + 1 ) ).get_ms();
       B_.spikecounter_.push_back( spikecounter( t_spike, multiplicity ) );
     }
@@ -113,7 +117,7 @@ nest::volume_transmitter::update( const Time&, const long from, const long to )
       % ( P_.deliver_interval_ * kernel().connection_manager.get_min_delay() )
     == 0 )
   {
-    double t_trig = Time( Time::step( kernel().simulation_manager.get_slice_origin().get_steps() + to ) ).get_ms() - Time::get_resolution().get_ms() * kernel().connection_manager.get_min_delay();
+    double t_trig = Time( Time::step( kernel().simulation_manager.get_slice_origin().get_steps() + to ) ).get_ms();// - Time::get_resolution().get_ms() * kernel().connection_manager.get_min_delay();
 std::cout<<"min_delay = " << Time::get_resolution().get_ms() * kernel().connection_manager.get_min_delay() << "\n";
 std::cout<<"In volume_transmitter::update(): triggering update at t_trig = " << t_trig << "\n";
 
@@ -134,6 +138,8 @@ std::cout<<"In volume_transmitter::update(): triggering update at t_trig = " << 
 void
 nest::volume_transmitter::handle( SpikeEvent& e )
 {
+    std::cout << "In volume_transmitter::handle(), t = " << e.get_stamp().get_ms() << " ms\n";
+
   B_.neuromodulatory_spikes_.add_value( e.get_rel_delivery_steps( kernel().simulation_manager.get_slice_origin() ),
     static_cast< double >( e.get_multiplicity() ) );
 }
