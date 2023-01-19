@@ -435,7 +435,7 @@ stdp_dopamine_synapse< targetidentifierT >::update_weight_( double c0,
   double minus_dt,
   const STDPDopaCommonProperties& cp )
 {
-std::cout << "\t\tIn update_weight_: c0 = " << c0 << ", n0 = " << n0 << ", minus_dt = " << minus_dt << ", old weight: " << weight_;
+std::cout << "\t\tIn stdp_dopamine_synapse::update_weight_: c0 = " << c0 << ", n0 = " << n0 << ", minus_dt = " << minus_dt << ", old weight: " << weight_;
   const double taus_ = ( cp.tau_c_ + cp.tau_n_ ) / ( cp.tau_c_ * cp.tau_n_ );
   weight_ = weight_
     - c0
@@ -546,7 +546,7 @@ stdp_dopamine_synapse< targetidentifierT >::send( Event& e, thread t, const STDP
   double dendritic_delay = get_delay();
 
   double t_spike = e.get_stamp().get_ms();
-std::cout << "in send(): t_pre_spike = " << t_spike << "\n";
+std::cout << "in stdp_dopamine_synapse::send(): t_pre_spike = " << t_spike << "\n";
   // get history of dopamine spikes
   const std::vector< spikecounter >& dopa_spikes = cp.vt_->deliver_spikes();
 

@@ -178,8 +178,10 @@ private:
   {
     RingBuffer neuromodulatory_spikes_; //!< buffer to store incoming spikes
     //! vector to store and deliver spikes
-    std::vector< spikecounter > spikecounter_;
+    // std::pair < std::vector< spikecounter >, std::vector< spikecounter > > spikecounter_ = { std::vector< spikecounter >, std::vector< spikecounter > };
+    std::vector < std::vector< spikecounter > > spikecounter_  { std::vector< spikecounter >(), std::vector< spikecounter >() };
   };
+    int spike_counter_buffer_idx_ = 0;
 
   Parameters_ P_;
   Buffers_ B_;
@@ -216,7 +218,7 @@ volume_transmitter::set_status( const DictionaryDatum& d )
 inline const std::vector< nest::spikecounter >&
 volume_transmitter::deliver_spikes()
 {
-  return B_.spikecounter_;
+  return B_.spikecounter_[1 - spike_counter_buffer_idx_];
 }
 
 inline void

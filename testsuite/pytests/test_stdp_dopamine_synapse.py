@@ -104,20 +104,31 @@ class STDPSynapseTest(unittest.TestCase):
 #dopa [ 4.6 46.2 97.5]
 
 
+        # ------
+        # USED TO ORIGINALLY INDICATE THE PROBLEM
+        # ------
+        # self.hardcoded_pre_times = -80.+ -3.1+np.array([87.6, 97.1], dtype=float)
+        # self.hardcoded_post_times = -80.+ -2.5+np.array([83.6, 98.4], dtype=float)
+        # if use_nestml:
+        #  self.hardcoded_dopa_times = -80.7+ -2.+np.array([ 97.5], dtype=float)
+        # else:
+        #  self.hardcoded_dopa_times = -80.+ -2.+np.array([ 97.5], dtype=float)
+        # self.hardcoded_trains_length = 2. + max(np.amax(self.hardcoded_pre_times), np.amax(self.hardcoded_post_times))
+        # self.sim_dura = 20.#np.round(self.hardcoded_trains_length + 10.)    # [ms]
+        # ------
 
-        self.hardcoded_pre_times = -80.+ -3.1+np.array([87.6, 97.1], dtype=float)
-        #self.hardcoded_pre_times = np.array([1, 5], dtype=float)
-        # self.hardcoded_pre_times = np.array([1, 5, 6, 7, 9, 11, 12, 13], dtype=float)
-        #self.hardcoded_post_times = np.array([2, 3], dtype=float)
-        #self.hardcoded_post_times = -2.5+np.array([40.9, 83.6, 98.4], dtype=float)
-        self.hardcoded_post_times = -80.+ -2.5+np.array([83.6, 98.4], dtype=float)
+
+
+
+        self.hardcoded_pre_times = np.array([4.5, 14.0, 19.], dtype=float)
+        self.hardcoded_post_times = np.array([1.1, 15.9], dtype=float)
         if use_nestml:
          self.hardcoded_dopa_times = -80.7+ -2.+np.array([ 97.5], dtype=float)
         else:
-         self.hardcoded_dopa_times = -80.+ -2.+np.array([ 97.5], dtype=float)
+         self.hardcoded_dopa_times = np.array([ 15.5], dtype=float)
         # self.hardcoded_post_times = np.array([2, 3, 4, 8, 9, 10, 12], dtype=float)
         self.hardcoded_trains_length = 2. + max(np.amax(self.hardcoded_pre_times), np.amax(self.hardcoded_post_times))
-        self.sim_dura = 20.#np.round(self.hardcoded_trains_length + 10.)    # [ms]
+        self.sim_dura = 25.#np.round(self.hardcoded_trains_length + 10.)    # [ms]
 
     def do_nest_simulation_and_compare_to_reproduced_weight(self, fname_snip):
         pre_spikes, post_spikes, dopa_spikes, t_weight_by_nest, weight_by_nest = self.do_the_nest_simulation()
@@ -148,9 +159,10 @@ class STDPSynapseTest(unittest.TestCase):
         This function is where calls to NEST reside. Returns the generated pre-, post spike, dopa spikes
         sequences, and the resulting weight established by STDP dopamine.
         """
-        nest.set_verbosity('M_WARNING')
+        nest.set_verbosity('M_ALL')
         nest.ResetKernel()
-        nest.Install("nestml_jit_module")
+        if use_nestml:
+         nest.Install("nestml_jit_module")
         nest.SetKernelStatus({'resolution': self.resolution})
 
         # create pre and postsynaptic neurons
@@ -284,8 +296,6 @@ class STDPSynapseTest(unittest.TestCase):
 
         post_spikes_delayed = post_spikes + self.dendritic_delay
         pre_spikes_delayed = pre_spikes
-        # post_spikes_delayed = post_spikes
-        # TODO check whether there is a delay for dopa spikes
         dopa_spikes_delayed = dopa_spikes + self.dendritic_delay
 
         print('post', post_spikes_delayed)
@@ -299,20 +309,20 @@ class STDPSynapseTest(unittest.TestCase):
              print("t = " + str(t))
             # idx_next_pre_spike = -1
             t_next_pre_spike = np.inf
-            if np.where(abs(pre_spikes_delayed - t)<e)[0].size > 0:
-                idx_next_pre_spike = np.where(abs(pre_spikes_delayed - t)<e)[0][0]
+            if np.where((pre_spikes_delayed - t) > 0)[0].size > 0:
+                idx_next_pre_spike = np.where((pre_spikes_delayed - t) > 0)[0][0]
                 t_next_pre_spike = pre_spikes_delayed[idx_next_pre_spike]
 
             # idx_next_post_spike = -1
             t_next_post_spike = np.inf
-            if np.where(abs(post_spikes_delayed - t)<e)[0].size > 0:
-                idx_next_post_spike = np.where(abs(post_spikes_delayed - t)<e)[0][0]
+            if np.where((post_spikes_delayed - t) > 0)[0].size > 0:
+                idx_next_post_spike = np.where((post_spikes_delayed - t) > 0)[0][0]
                 t_next_post_spike = post_spikes_delayed[idx_next_post_spike]
 
             # idx_next_dopa_spike = -1
             t_next_dopa_spike = np.inf
-            if np.where(abs(dopa_spikes_delayed - t)<e)[0].size > 0:
-                idx_next_dopa_spike = np.where(abs(dopa_spikes_delayed - t)<e)[0][0]
+            if np.where((dopa_spikes_delayed - t) > 0)[0].size > 0:
+                idx_next_dopa_spike = np.where((dopa_spikes_delayed - t) > 0)[0][0]
                 t_next_dopa_spike = dopa_spikes_delayed[idx_next_dopa_spike]
 
             handle_dopa_spike = False
@@ -327,14 +337,25 @@ class STDPSynapseTest(unittest.TestCase):
                     handle_post_spike = True
                 if t_next == t_next_pre_spike:
                     handle_pre_spike = True
-            
+
+            if t_next == np.inf:
+                # no more spikes to process
+                t_next = self.sim_dura
+                break
+
+
+            #t += self.resolution
+            h = t - t_next
+            t = t_next
+
+
             # update weight
             if do_print:
              print("\tUpdating weight, c0 = " + str(c) + ", n0 = " + str(n) + ", minus_dt = " + str(-self.resolution) + ", old weight = " + str(weight), end="")
             weight = update_weight(weight, c, n, self.resolution)
             if do_print:
              print(", new weight = " + str(weight))
-            
+
 
             c = c * exp(-self.resolution / self.synapse_parameters["tau_c"])
             n = n * exp(-self.resolution / self.synapse_parameters["tau_n"])
@@ -351,7 +372,7 @@ class STDPSynapseTest(unittest.TestCase):
 
             # compute c
             if handle_post_spike:
-                Kpost += 1. 
+                Kpost += 1.
                 c = facilitate(c, Kpre)
                 print('\thandle_post_spike c=%f, n=%f, weight=%f' % (c, n, weight))
                 #print('t_next', t_next)
@@ -367,7 +388,6 @@ class STDPSynapseTest(unittest.TestCase):
             w_log.append(weight)
             Kpre_log.append(Kpre)
 
-            t += self.resolution
 
         #Kpost_log = [Kpost_at_time(t - self.dendritic_delay, post_spikes) for t in t_log]
         if DEBUG_PLOTS:

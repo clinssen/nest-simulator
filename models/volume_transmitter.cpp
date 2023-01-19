@@ -81,20 +81,24 @@ void
 nest::volume_transmitter::init_buffers_()
 {
   B_.neuromodulatory_spikes_.clear();
-  B_.spikecounter_.clear();
-  B_.spikecounter_.push_back( spikecounter( 0.0, 0.0 ) ); // insert pseudo last dopa spike at t = 0.0
+  B_.spikecounter_[0].clear();
+  B_.spikecounter_[1].clear();
+  B_.spikecounter_[0].push_back( spikecounter( 0.0, 0.0 ) ); // insert pseudo last dopa spike at t = 0.0
+  B_.spikecounter_[1].push_back( spikecounter( 0.0, 0.0 ) ); // insert pseudo last dopa spike at t = 0.0
 }
 
 void
 nest::volume_transmitter::pre_run_hook()
 {
   // +1 as pseudo dopa spike at t_trig is inserted after trigger_update_weight
-  B_.spikecounter_.reserve( kernel().connection_manager.get_min_delay() * P_.deliver_interval_ + 1 );
+  B_.spikecounter_[0].reserve( kernel().connection_manager.get_min_delay() * P_.deliver_interval_ + 1 );
+  B_.spikecounter_[1].reserve( kernel().connection_manager.get_min_delay() * P_.deliver_interval_ + 1 );
 }
 
 void
 nest::volume_transmitter::update( const Time& origin, const long from, const long to )
 {
+  spike_counter_buffer_idx_ = 1 - spike_counter_buffer_idx_;
   std::cout << "In volume_transmitter::update(): t = " << origin.get_ms() << " ms\n";
 
   // spikes that arrive in this time slice are stored in spikecounter_
@@ -102,13 +106,13 @@ nest::volume_transmitter::update( const Time& origin, const long from, const lon
   double multiplicity;
   for ( long lag = from; lag < to; ++lag )
   {
+    //std::cout<<"\tgrabbing spikes from " << from << " to " << to << "\n"; // always from 0 to 10
     multiplicity = B_.neuromodulatory_spikes_.get_value( lag );
     if ( multiplicity > 0 )
     {
-        std::cout << "\tthere is a spike!\n";
-
       t_spike = Time( Time::step( kernel().simulation_manager.get_slice_origin().get_steps() + lag + 1 ) ).get_ms();
-      B_.spikecounter_.push_back( spikecounter( t_spike, multiplicity ) );
+      std::cout << "\tthere is a spike at t = " << t_spike << " ms\n";
+      B_.spikecounter_[spike_counter_buffer_idx_].push_back( spikecounter( t_spike, multiplicity ) );
     }
   }
 
@@ -117,21 +121,23 @@ nest::volume_transmitter::update( const Time& origin, const long from, const lon
       % ( P_.deliver_interval_ * kernel().connection_manager.get_min_delay() )
     == 0 )
   {
-    double t_trig = Time( Time::step( kernel().simulation_manager.get_slice_origin().get_steps() + to ) ).get_ms();// - Time::get_resolution().get_ms() * kernel().connection_manager.get_min_delay();
+    double t_trig = Time( Time::step( kernel().simulation_manager.get_slice_origin().get_steps() + to ) ).get_ms() - Time::get_resolution().get_ms() * kernel().connection_manager.get_min_delay();
+    double t_trig2 = Time( Time::step( kernel().simulation_manager.get_slice_origin().get_steps() ) ).get_ms();
+    assert (t_trig == t_trig2);
 std::cout<<"min_delay = " << Time::get_resolution().get_ms() * kernel().connection_manager.get_min_delay() << "\n";
 std::cout<<"In volume_transmitter::update(): triggering update at t_trig = " << t_trig << "\n";
 
-    if ( not B_.spikecounter_.empty() )
+    if ( not B_.spikecounter_[1 - spike_counter_buffer_idx_].empty() )
     {
-      kernel().connection_manager.trigger_update_weight( get_node_id(), B_.spikecounter_, t_trig );
+      kernel().connection_manager.trigger_update_weight( get_node_id(), B_.spikecounter_[1 - spike_counter_buffer_idx_], t_trig );
     }
 
     // clear spikecounter
-    B_.spikecounter_.clear();
+    B_.spikecounter_[1 - spike_counter_buffer_idx_].clear();
 
     // as with trigger_update_weight dopamine trace has been updated to t_trig,
     // insert pseudo last dopa spike at t_trig
-    B_.spikecounter_.push_back( spikecounter( t_trig, 0.0 ) );
+    B_.spikecounter_[1 - spike_counter_buffer_idx_].push_back( spikecounter( t_trig, 0.0 ) );
   }
 }
 
