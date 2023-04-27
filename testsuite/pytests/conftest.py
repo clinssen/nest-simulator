@@ -57,6 +57,20 @@ def have_gsl():
     return nest.ll_api.sli_func("statusdict/have_gsl ::")
 
 
+@pytest.fixture(scope="session")
+def have_plotting():
+    try:
+        import matplotlib
+        matplotlib.use('Agg')   # backend without window
+        import matplotlib.pyplot as plt
+
+        tmp_fig = plt.figure()  # make sure we can open a figure
+        plt.close(tmp_fig)
+        return True
+    except ImportError:
+        return False
+
+
 @pytest.fixture(scope="module", autouse=True)
 def safety_reset():
     """
@@ -98,3 +112,12 @@ def skipif_missing_threads(request, have_threads):
     """
     if not have_threads and request.node.get_closest_marker("skipif_missing_threads"):
         pytest.skip("skipped because missing multithreading support.")
+
+
+@pytest.fixture(autouse=True)
+def skipif_missing_plotting(request, have_plotting):
+    """
+    Globally applied fixture that skips tests marked to be skipped when plotting (e.g. matplotlib) support is missing.
+    """
+    if not have_plotting and request.node.get_closest_marker("skipif_missing_plotting"):
+        pytest.skip("skipped because missing plotting support.")
