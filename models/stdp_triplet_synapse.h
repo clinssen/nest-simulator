@@ -255,6 +255,7 @@ template < typename targetidentifierT >
 inline void
 stdp_triplet_synapse< targetidentifierT >::send( Event& e, thread t, const CommonSynapseProperties& )
 {
+
   double t_spike = e.get_stamp().get_ms();
   double dendritic_delay = get_delay();
   Node* target = get_target( t );

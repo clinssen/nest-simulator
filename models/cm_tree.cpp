@@ -70,6 +70,7 @@ nest::Compartment::Compartment( const long compartment_index,
   , hh( 0.0 )
   , n_passed( 0 )
 {
+
   updateValue< double >( compartment_params, names::C_m, ca );
   updateValue< double >( compartment_params, names::g_C, gc );
   updateValue< double >( compartment_params, names::g_L, gl );

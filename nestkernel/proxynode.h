@@ -111,6 +111,12 @@ public:
 
   bool is_proxy() const override;
 
+  thread
+  get_thread() const
+  {
+    assert( false );
+  }
+
 private:
   void
   init_state_() override

@@ -33,8 +33,6 @@
 
 */
 
-skip_if_not_threaded
-
 (unittest) run
 /unittest using
 

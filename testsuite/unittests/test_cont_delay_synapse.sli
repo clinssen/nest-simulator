@@ -20,8 +20,6 @@
  *
  */
 
-% SLI2PYComplexity: Low
-
  /** @BeginDocumentation
 Name: testsuite::test_cont_delay_synapse - test of synapse with continuous delay
 

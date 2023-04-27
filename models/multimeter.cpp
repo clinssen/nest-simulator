@@ -205,6 +205,9 @@ multimeter::handle( DataLoggingReply& reply )
   // easy access to relevant information
   DataLoggingReply::Container const& info = reply.get_info();
 
+  // count records that have been skipped during inactivity
+  size_t inactive_skipped = 0;
+
   // record all data, time point by time point
   for ( size_t j = 0; j < info.size(); ++j )
   {
@@ -215,10 +218,14 @@ multimeter::handle( DataLoggingReply& reply )
 
     if ( not is_active( info[ j ].timestamp ) )
     {
+      ++inactive_skipped;
       continue;
     }
 
     reply.set_stamp( info[ j ].timestamp );
+    // const index sender = reply.get_sender_node_id();
+    // const Time stamp = reply.get_stamp();
+    // const double offset = reply.get_offset();
 
     write( reply, info[ j ].data, RecordingBackend::NO_LONG_VALUES );
   }
@@ -229,6 +236,11 @@ multimeter::get_type() const
 {
   return RecordingDevice::MULTIMETER;
 }
+
+
+//
+// Definition of voltmeter subclass
+//
 
 voltmeter::voltmeter()
   : multimeter()

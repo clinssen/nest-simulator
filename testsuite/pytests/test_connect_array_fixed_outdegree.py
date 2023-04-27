@@ -29,10 +29,6 @@ import nest
 import numpy
 
 
-HAVE_OPENMP = nest.ll_api.sli_func("is_threaded")
-
-
-@unittest.skipIf(not HAVE_OPENMP, 'NEST was compiled without multi-threading')
 @nest.ll_api.check_stack
 class ConnectArrayFixedOutdegreeTestCase(unittest.TestCase):
     """Tests of connections with fixed outdegree and parameter arrays"""

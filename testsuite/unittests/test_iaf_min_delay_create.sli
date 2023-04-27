@@ -20,8 +20,6 @@
  *
  */
 
-% SLI2PYComplexity: Low
-
  /** @BeginDocumentation
 Name: testsuite::test_iaf_min_delay_create - sli script for testing automatic adjustment of min_delay
 

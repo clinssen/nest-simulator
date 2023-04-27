@@ -178,7 +178,7 @@ if [ "$xNEST_BUILD_TYPE" = "FULL_MACOS" ]; then
     xLTDL=1
     xMPI=1
     xMUSIC=0
-    xOPENMP=1
+    xOPENMP=0
     xPYTHON=1
     xREADLINE=1
     xSIONLIB=0
@@ -196,9 +196,6 @@ echo "MSGBLD0232: Setting configuration variables."
 
 if [ "$xOPENMP" = "1" ] ; then
     CONFIGURE_OPENMP="-Dwith-openmp=ON"
-    if [ "$xNEST_BUILD_TYPE" = "FULL_MACOS" ]; then
-	CONFIGURE_OPENMP="${CONFIGURE_OPENMP} -DOpenMP_ROOT=`brew --prefix libomp`"
-    fi
 else
     CONFIGURE_OPENMP="-Dwith-openmp=OFF"
 fi
@@ -306,7 +303,6 @@ cmake \
     -DCMAKE_CXX_FLAGS="$CXX_FLAGS" \
     -Dwith-optimize=ON \
     -Dwith-warning=ON \
-    -Dwith-userdoc=OFF \
     $CONFIGURE_BOOST \
     $CONFIGURE_OPENMP \
     $CONFIGURE_MPI \

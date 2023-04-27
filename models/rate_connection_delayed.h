@@ -29,7 +29,7 @@
 namespace nest
 {
 
-/* BeginUserDocs: synapse, rate
+/* BeginUserDocs: synapse, connection with delay, rate
 
 Short description
 +++++++++++++++++
