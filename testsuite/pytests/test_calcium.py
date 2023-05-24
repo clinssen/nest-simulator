@@ -37,7 +37,7 @@ def reset_kernel():
 
 
 # Obtain all models with calcium concentration
-models = [model for model in nest.node_models if 'Ca' in nest.GetDefaults(model)]
+models = [model for model in nest.node_models if "Ca" in nest.GetDefaults(model)]
 
 
 def test_at_least_one_model():
@@ -47,14 +47,14 @@ def test_at_least_one_model():
     assert len(models) > 0
 
 
-@pytest.mark.parametrize('model', models)
+@pytest.mark.parametrize("model", models)
 def test_calcium_set_get(model):
     """
-    Verify setters and getters for models with calcium concentration. 
+    Verify setters and getters for models with calcium concentration.
     """
 
     ca_default = nest.GetDefaults(model, "Ca")
-    n = nest.Create(model, params={'Ca': ca_default + 42.})
-    assert n.Ca == pytest.approx(ca_default + 42.)
-    n.Ca = ca_default + 99999.
-    assert n.Ca == pytest.approx(ca_default + 99999.)
+    n = nest.Create(model, params={"Ca": ca_default + 42.0})
+    assert n.Ca == pytest.approx(ca_default + 42.0)
+    n.Ca = ca_default + 99999.0
+    assert n.Ca == pytest.approx(ca_default + 99999.0)
