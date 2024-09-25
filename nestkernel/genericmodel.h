@@ -71,6 +71,8 @@ public:
    */
   size_t send_test_event( Node&, size_t, synindex, bool ) override;
 
+  void sends_secondary_event( ArbitraryDataEvent& ge ) override;
+
   void sends_secondary_event( GapJunctionEvent& ge ) override;
 
   SignalType sends_signal() const override;
@@ -187,6 +189,13 @@ inline size_t
 GenericModel< ElementT >::send_test_event( Node& target, size_t receptor, synindex syn_id, bool dummy_target )
 {
   return proto_.send_test_event( target, receptor, syn_id, dummy_target );
+}
+
+template < typename ElementT >
+inline void
+GenericModel< ElementT >::sends_secondary_event( ArbitraryDataEvent& ge )
+{
+  return proto_.sends_secondary_event( ge );
 }
 
 template < typename ElementT >

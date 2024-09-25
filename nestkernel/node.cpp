@@ -353,6 +353,23 @@ Node::handles_test_event( DSCurrentEvent&, size_t )
 }
 
 void
+Node::handle( ArbitraryDataEvent& )
+{
+  throw UnexpectedEvent( "The target node does not handle ArbitraryDataEvent input." );
+}
+
+size_t
+Node::handles_test_event( ArbitraryDataEvent&, size_t )
+{
+  throw IllegalConnection( "The target node or synapse model does not support gap junction input." );
+}
+
+void
+Node::sends_secondary_event( ArbitraryDataEvent& )
+{
+  throw IllegalConnection( "The source node does not support gap junction output." );
+}
+void
 Node::handle( GapJunctionEvent& )
 {
   throw UnexpectedEvent( "The target node does not handle gap junction input." );

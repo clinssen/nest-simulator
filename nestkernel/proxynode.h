@@ -82,6 +82,7 @@ public:
   size_t send_test_event( Node&, size_t, synindex, bool ) override;
 
   void sends_secondary_event( GapJunctionEvent& ) override;
+  void sends_secondary_event( ArbitraryDataEvent& ) override;
 
   /**
    * This function returns the type of signal this node produces.

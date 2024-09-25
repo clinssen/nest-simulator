@@ -134,6 +134,12 @@ GapJunctionEvent::operator()()
 }
 
 void
+ArbitraryDataEvent::operator()()
+{
+  receiver_->handle( *this );
+}
+
+void
 InstantaneousRateConnectionEvent::operator()()
 {
   receiver_->handle( *this );

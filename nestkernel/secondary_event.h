@@ -291,6 +291,19 @@ public:
   DataType get_coeffvalue( std::vector< unsigned int >::iterator& pos );
 };
 
+class ArbitraryDataEvent : public DataSecondaryEvent< double, ArbitraryDataEvent >
+{
+
+public:
+  ArbitraryDataEvent()
+  {
+  }
+
+  void operator()() override;
+  ArbitraryDataEvent* clone() const override;
+};
+
+
 /**
  * Event for gap-junction information. The event transmits the interpolation
  * of the membrane potential to the connected neurons.
@@ -411,6 +424,12 @@ inline GapJunctionEvent*
 GapJunctionEvent::clone() const
 {
   return new GapJunctionEvent( *this );
+}
+
+inline ArbitraryDataEvent*
+ArbitraryDataEvent::clone() const
+{
+  return new ArbitraryDataEvent( *this );
 }
 
 inline InstantaneousRateConnectionEvent*

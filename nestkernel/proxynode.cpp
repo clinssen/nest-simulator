@@ -56,6 +56,12 @@ proxynode::sends_secondary_event( GapJunctionEvent& ge )
 }
 
 void
+proxynode::sends_secondary_event( ArbitraryDataEvent& ge )
+{
+  kernel().model_manager.get_node_model( get_model_id() )->sends_secondary_event( ge );
+}
+
+void
 proxynode::sends_secondary_event( InstantaneousRateConnectionEvent& re )
 {
   kernel().model_manager.get_node_model( get_model_id() )->sends_secondary_event( re );
