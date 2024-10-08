@@ -377,7 +377,6 @@ nest::iaf_psc_exp::handle( SpikeEvent& e )
 
   // separate buffer channels for excitatory and inhibitory inputs
   B_.input_buffer_.add_value( input_buffer_slot, s > 0 ? Buffers_::SYN_EX : Buffers_::SYN_IN, s );
-  // B_.input_offset_buffer_.add_value( input_buffer_slot, s > 0 ? Buffers_::SYN_EX : Buffers_::SYN_IN, e.get_offset() );
 }
 
 void

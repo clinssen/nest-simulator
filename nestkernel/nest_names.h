@@ -215,7 +215,6 @@ extern const Name eta;
 extern const Name events;
 extern const Name extent;
 
-extern const Name foo;
 extern const Name f_target;
 extern const Name file_extension;
 extern const Name filename;
