@@ -335,6 +335,19 @@ nest::iaf_psc_exp::update( const Time& origin, const long from, const long to )
       set_spiketime( Time::step( origin.get_steps() + lag + 1 ) );
 
       SpikeEvent se;
+
+
+      auto get_t = [origin, lag](){ return nest::Time( nest::Time::step( origin.get_steps() + lag + 1) ).get_ms(); };
+      std::cout << "t = " << get_t() << "\n";
+      if (get_t() < 10.)
+      {
+        se.set_offset(42.);
+      }
+      else
+      {
+        se.set_offset(3.14159);
+      }
+      std::cout << "Sending spike with offset = " << se.get_offset() << "\n";
       kernel().event_delivery_manager.send( *this, se, lag );
     }
 
@@ -360,8 +373,11 @@ nest::iaf_psc_exp::handle( SpikeEvent& e )
 
   const double s = e.get_weight() * e.get_multiplicity();
 
+  std::cout << "Got a spike with offset " << e.get_offset() << "\n";
+
   // separate buffer channels for excitatory and inhibitory inputs
   B_.input_buffer_.add_value( input_buffer_slot, s > 0 ? Buffers_::SYN_EX : Buffers_::SYN_IN, s );
+  // B_.input_offset_buffer_.add_value( input_buffer_slot, s > 0 ? Buffers_::SYN_EX : Buffers_::SYN_IN, e.get_offset() );
 }
 
 void

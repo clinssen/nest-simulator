@@ -187,6 +187,7 @@ const Name eta( "eta" );
 const Name events( "events" );
 const Name extent( "extent" );
 
+const Name foo( "foo" );
 const Name f_target( "f_target" );
 const Name file_extension( "file_extension" );
 const Name filename( "filename" );
