@@ -277,6 +277,12 @@ public:
   size_t handles_test_event( CurrentEvent&, size_t ) override;
   size_t handles_test_event( DataLoggingRequest&, size_t ) override;
 
+ bool
+  is_off_grid() const override
+  {
+    return true;
+  }
+
   void get_status( DictionaryDatum& ) const override;
   void set_status( const DictionaryDatum& ) override;
 
