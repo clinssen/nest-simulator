@@ -239,6 +239,9 @@ template < typename targetidentifierT >
 inline bool
 stdp_synapse< targetidentifierT >::send( Event& e, size_t t, const CommonSynapseProperties& )
 {
+  // check if it's a normal spike or a complex spike
+  std::cout << "In STDP synapse: got a spike with offset " << e.get_offset() << "\n";
+
   // synapse STDP depressing/facilitation dynamics
   const double t_spike = e.get_stamp().get_ms();
 
